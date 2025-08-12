@@ -397,7 +397,38 @@ void FillCircleBRH(int cx, int cy, float radio)
 	FillWithBRH(x, y);
 }
 
+//------------------------------------------------------------------------------------
+//Realiza el movimiento de Translacion, Escala y Rotacion de las figuras
+//------------------------------------------------------------------------------------
 
+//Matris de translacion
+void Translate(int x, int y)
+{
+	for (int i = 0; i < ptsCount; i++)
+	{
+		pts[i].x += x;
+		pts[i].y += y;
+	}
+}
+
+//Aplica la translacion a la figura guardada
+void ApplyTranslation(int x, int y)
+{
+	Translate(x, y);
+	for (int i = 0; i < ptsCount; i++)
+	{
+		DrawPixel(pts[i].x, pts[i].y, RED);
+	}
+}
+
+
+//Matris de Escalado
+
+//Matris de Rotacion
+
+//------------------------------------------------------------------------------------
+// Main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
     const int screenWidth = 800;
@@ -433,6 +464,9 @@ int main(void)
         FillSquareDDA(screenWidth / 2, screenHeight / 2, 600, 600);
 		FillTriangleDAA(screenWidth / 2, screenHeight / 2, screenWidth / 2 + 200, screenHeight / 2, screenWidth / 2 + 100, screenHeight / 2 - 150);
 		FillCircleDDA(500, 700, 30.f);
+
+		//Translacion
+		Translate(100, 100);
 
         EndDrawing();
     }
