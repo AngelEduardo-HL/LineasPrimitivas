@@ -128,7 +128,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LineasPrimitivas.cpp" />
+    <ClCompile Include="Circulo.cpp" />
+    <ClCompile Include="Cuadrado.cpp" />
+    <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Triangulo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Circulo.h" />
+    <ClInclude Include="Cuadrado.h" />
+    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Triangulo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
