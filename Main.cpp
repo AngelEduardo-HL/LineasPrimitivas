@@ -1,364 +1,11 @@
 #include <iostream>
 #include "raylib.h"
-#include <vector>
-#include <algorithm>
 
-struct Point { int x, y; };
+#include "Geometry.h"
+#include "Cuadrado.h"
+#include "Triangulo.h"
+#include "Circulo.h"
 
-#define MAX_POINTS 2000
-static Point pts[MAX_POINTS];
-static int ptsCount = 0;
-
-// ======================= Utilidades de puntos =======================
-void clearPoints()
-{
-    ptsCount = 0;
-}
-
-void SavePoints(int X, int Y)
-{
-    if (ptsCount < MAX_POINTS) pts[ptsCount++] = { X, Y };
-}
-
-void SavePointsSquare(int X1, int Y1, int X2, int Y2)
-{
-    clearPoints();
-    int Xmin = (X1 < X2) ? X1 : X2;
-    int Xmax = (X1 > X2) ? X1 : X2;
-    int Ymin = (Y1 < Y2) ? Y1 : Y2;
-    int Ymax = (Y1 > Y2) ? Y1 : Y2;
-
-    for (int x = Xmin; x <= Xmax; x++)
-    {
-        SavePoints(x, Ymin);
-        SavePoints(x, Ymax);
-    }
-    for (int y = Ymin; y <= Ymax; y++)
-    {
-        SavePoints(Xmin, y);
-        SavePoints(Xmax, y);
-    }
-}
-
-void SavePointsTriangle(int X1, int Y1, int X2, int Y2, int X3, int Y3)
-{
-    clearPoints();
-
-    // Lado 1
-    {
-        float dx = X2 - X1, dy = Y2 - Y1;
-        float ax = (dx < 0) ? -dx : dx, ay = (dy < 0) ? -dy : dy;
-        int steps = (int)((ax > ay) ? ax : ay);
-        if (steps == 0) { SavePoints(X1, Y1); }
-        else {
-            float xInc = dx / steps, yInc = dy / steps;
-            float x = (float)X1, y = (float)Y1;
-            for (int i = 0; i <= steps; i++) {
-                SavePoints((int)(x + 0.5f), (int)(y + 0.5f));
-                x += xInc; y += yInc;
-            }
-        }
-    }
-    // Lado 2
-    {
-        float dx = X3 - X2, dy = Y3 - Y2;
-        float ax = (dx < 0) ? -dx : dx, ay = (dy < 0) ? -dy : dy;
-        int steps = (int)((ax > ay) ? ax : ay);
-        if (steps == 0) { SavePoints(X2, Y2); }
-        else {
-            float xInc = dx / steps, yInc = dy / steps;
-            float x = (float)X2, y = (float)Y2;
-            for (int i = 0; i <= steps; i++) {
-                SavePoints((int)(x + 0.5f), (int)(y + 0.5f));
-                x += xInc; y += yInc;
-            }
-        }
-    }
-    // Lado 3
-    {
-        float dx = X1 - X3, dy = Y1 - Y3;
-        float ax = (dx < 0) ? -dx : dx, ay = (dy < 0) ? -dy : dy;
-        int steps = (int)((ax > ay) ? ax : ay);
-        if (steps == 0) { SavePoints(X3, Y3); }
-        else {
-            float xInc = dx / steps, yInc = dy / steps;
-            float x = (float)X3, y = (float)Y3;
-            for (int i = 0; i <= steps; i++) {
-                SavePoints((int)(x + 0.5f), (int)(y + 0.5f));
-                x += xInc; y += yInc;
-            }
-        }
-    }
-}
-
-void SavePointsCircle(int cx, int cy, float radio)
-{
-    clearPoints();
-    int r = (int)(radio + 0.5f);
-    int x = 0;
-    int y = r;
-    int d = 1 - r;
-
-    auto save8 = [&](int xx, int yy)
-        {
-            SavePoints(cx + xx, cy + yy);
-            SavePoints(cx - xx, cy + yy);
-            SavePoints(cx + xx, cy - yy);
-            SavePoints(cx - xx, cy - yy);
-            SavePoints(cx + yy, cy + xx);
-            SavePoints(cx - yy, cy + xx);
-            SavePoints(cx + yy, cy - xx);
-            SavePoints(cx - yy, cy - xx);
-        };
-
-    while (x <= y)
-    {
-        save8(x, y);
-        if (d < 0) d += 2 * x + 3;
-        else { d += 2 * (x - y) + 5; y--; }
-        x++;
-    }
-}
-
-// ======================= Líneas y Figuras (DDA/BRH) =======================
-void DDALine(int X1, int Y1, int X2, int Y2, Color col = GREEN)
-{
-    float dx = X2 - X1;
-    float dy = Y2 - Y1;
-    float absdx = (dx < 0) ? -dx : dx;
-    float absdy = (dy < 0) ? -dy : dy;
-    int steps = (absdx > absdy) ? (int)absdx : (int)absdy;
-    if (steps <= 0) { DrawPixel(X1, Y1, col); return; }
-
-    float xInc = dx / steps;
-    float yInc = dy / steps;
-    float x = X1;
-    float y = Y1;
-    for (int i = 0; i <= steps; i++)
-    {
-        DrawPixel((int)(x + 0.5f), (int)(y + 0.5f), col);
-        x += xInc; y += yInc;
-    }
-}
-
-void DDATriangle(int X1, int Y1, int X2, int Y2, int X3, int Y3)
-{
-    DDALine(X1, Y1, X2, Y2);
-    DDALine(X2, Y2, X3, Y3);
-    DDALine(X3, Y3, X1, Y1);
-}
-
-void DDASquare(int X1, int Y1, int X2, int Y2)
-{
-    DDALine(X1, Y1, X2, Y1);
-    DDALine(X2, Y1, X2, Y2);
-    DDALine(X2, Y2, X1, Y2);
-    DDALine(X1, Y2, X1, Y1);
-}
-
-void DDALCircle(float X, float Y, float radio, float grados)
-{
-    if (radio <= 0.0f) return;
-    float dtheta = 1.0f / radio;
-    float cosd = cosf(dtheta), sind = sinf(dtheta);
-    float x = radio, y = 0.0f;
-
-    int steps = (int)(2.0f * PI / dtheta) + 1;
-    for (int i = 0; i < steps; ++i)
-    {
-        DrawPixel((int)(X + x + 0.5f), (int)(Y + y + 0.5f), GREEN);
-        float xn = x * cosd - y * sind;
-        float yn = x * sind + y * cosd;
-        x = xn; y = yn;
-    }
-}
-
-void BRHLine(int X1, int Y1, int X2, int Y2, Color col = YELLOW)
-{
-    if (X1 == X2 && Y1 == Y2) { DrawPixel(X1, Y1, col); return; }
-
-    int dx = (X2 > X1) ? (X2 - X1) : (X1 - X2);
-    int dy = (Y2 > Y1) ? (Y2 - Y1) : (Y1 - Y2);
-    int sx = (X1 < X2) ? 1 : -1;
-    int sy = (Y1 < Y2) ? 1 : -1;
-
-    int x = X1, y = Y1;
-
-    if (dx >= dy)
-    {
-        int p = 2 * dy - dx;
-        while (true)
-        {
-            DrawPixel(x, y, col);
-            if (x == X2) break;
-            x += sx;
-            if (p >= 0) { y += sy; p += 2 * (dy - dx); }
-            else { p += 2 * dy; }
-        }
-    }
-    else
-    {
-        int p = 2 * dx - dy;
-        while (true)
-        {
-            DrawPixel(x, y, col);
-            if (y == Y2) break;
-            y += sy;
-            if (p >= 0) { x += sx; p += 2 * (dx - dy); }
-            else { p += 2 * dx; }
-        }
-    }
-}
-
-void BRHsqueare(int X1, int Y1, int X2, int Y2)
-{
-    BRHLine(X1, Y1, X2, Y1);
-    BRHLine(X2, Y1, X2, Y2);
-    BRHLine(X2, Y2, X1, Y2);
-    BRHLine(X1, Y2, X1, Y1);
-}
-
-void BRHTriangle(int X1, int Y1, int X2, int Y2, int X3, int Y3)
-{
-    BRHLine(X1, Y1, X2, Y2);
-    BRHLine(X2, Y2, X3, Y3);
-    BRHLine(X3, Y3, X1, Y1);
-}
-
-void BRHCircle(int X1, int Y1, float radio, float grados)
-{
-    int r = (int)(radio + 0.5f);
-    if (r <= 0) return;
-
-    int x = 0, y = r;
-    int d = 1 - r;
-
-    auto draw8 = [&](int xx, int yy)
-        {
-            DrawPixel(X1 + xx, Y1 + yy, YELLOW);
-            DrawPixel(X1 - xx, Y1 + yy, YELLOW);
-            DrawPixel(X1 + xx, Y1 - yy, YELLOW);
-            DrawPixel(X1 - xx, Y1 - yy, YELLOW);
-            DrawPixel(X1 + yy, Y1 + xx, YELLOW);
-            DrawPixel(X1 - yy, Y1 + xx, YELLOW);
-            DrawPixel(X1 + yy, Y1 - xx, YELLOW);
-            DrawPixel(X1 - yy, Y1 - xx, YELLOW);
-        };
-
-    while (x <= y)
-    {
-        draw8(x, y);
-        if (d < 0) d += 2 * x + 3;
-        else { d += 2 * (x - y) + 5; y--; }
-        x++;
-    }
-}
-
-// ======================= Relleno por rasterización Y =======================
-namespace ScanlineY
-{
-    // Dibuja una línea horizontal entre x0 y x1 en la coordenada y
-    static void Fill(Color col)
-    {
-        if (ptsCount <= 0) return;
-
-        int ymin = pts[0].y, ymax = pts[0].y;
-        for (int i = 1; i < ptsCount; ++i)
-        {
-            if (pts[i].y < ymin) ymin = pts[i].y;
-            if (pts[i].y > ymax) ymax = pts[i].y;
-        }
-
-        // Agrupa los puntos por coordenada y
-        for (int y = ymin; y <= ymax; ++y)
-        {
-            std::vector<int> xs;
-            xs.reserve(64);
-
-            for (int i = 0; i < ptsCount; ++i)
-                if (pts[i].y == y) xs.push_back(pts[i].x);
-
-            if (xs.empty()) continue;
-
-            std::sort(xs.begin(), xs.end());
-            if (xs.size() % 2 != 0) xs.push_back(xs.back());
-
-            for (size_t k = 0; k + 1 < xs.size(); k += 2)
-            {
-                int x0 = xs[k], x1 = xs[k + 1];
-                if (x1 < x0) std::swap(x0, x1);
-                DrawLine(x0, y, x1, y, col);
-            }
-        }
-    }
-}
-
-static void CircleScanlineY(int cx, int cy, int r, Color col)
-{
-    if (r <= 0) return;
-
-    for (int dy = 0; dy <= r; ++dy)
-    {
-        int dx = (int)(sqrtf((float)(r * r - dy * dy)) + 0.0f);
-
-        DrawLine(cx - dx, cy - dy, cx + dx, cy - dy, col);
-
-        if (dy > 0)
-            DrawLine(cx - dx, cy + dy, cx + dx, cy + dy, col);
-    }
-}
-
-void FillWithDDA(int cx, int cy)
-{
-    ScanlineY::Fill(GREEN);
-}
-void FillWithBRH(int cx, int cy)
-{
-    ScanlineY::Fill(YELLOW);
-}
-
-// ======================= coloreado por figura =======================
-void FillSquareDDA(int X1, int Y1, int X2, int Y2)
-{
-    SavePointsSquare(X1, Y1, X2, Y2);
-    DDASquare(X1, Y1, X2, Y2);
-    FillWithDDA(0, 0);
-}
-
-void FillTriangleDAA(int X1, int Y1, int X2, int Y2, int X3, int Y3)
-{
-    SavePointsTriangle(X1, Y1, X2, Y2, X3, Y3);
-    DDATriangle(X1, Y1, X2, Y2, X3, Y3);
-    FillWithDDA(0, 0);
-}
-
-void FillCircleDDA(int cx, int cy, float radio)
-{
-    SavePointsCircle(cx, cy, radio);
-    DDALCircle((float)cx, (float)cy, radio, 0);
-    CircleScanlineY(cx, cy, (int)(radio + 0.5f), GREEN);
-}
-
-void FillSquareBRH(int X1, int Y1, int X2, int Y2)
-{
-    SavePointsSquare(X1, Y1, X2, Y2);
-    BRHsqueare(X1, Y1, X2, Y2);
-    FillWithBRH(0, 0);
-}
-
-void FillTriangleBRH(int X1, int Y1, int X2, int Y2, int X3, int Y3)
-{
-    SavePointsTriangle(X1, Y1, X2, Y2, X3, Y3);
-    BRHTriangle(X1, Y1, X2, Y2, X3, Y3);
-    FillWithBRH(0, 0);
-}
-
-void FillCircleBRH(int cx, int cy, float radio)
-{
-    SavePointsCircle(cx, cy, radio);
-    BRHCircle(cx, cy, radio, 0);
-    CircleScanlineY(cx, cy, (int)(radio + 0.5f), YELLOW);
-}
 
 // ======================= Main =======================
 int main(void)
@@ -369,29 +16,34 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "GigaChadWindow");
     SetTargetFPS(60);
 
+	// Inicializar geometría
+	Cuadrado square;
+	Triangulo triangle;
+	Circulo circle;
+
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(BLACK);
 
         // Casita con DDA
-        DDASquare(screenWidth / 2, screenHeight / 2, 600, 600);
-        DDATriangle(screenWidth / 2, screenHeight / 2, screenWidth / 2 + 200, screenHeight / 2, screenWidth / 2 + 100, screenHeight / 2 - 150);
-        DDALCircle(500, 700, 30, 0);
+        square.DrawDDA(screenWidth / 2, screenHeight / 2, 600, 600);
+        triangle.DrawDDA(screenWidth / 2, screenHeight / 2, screenWidth / 2 + 200, screenHeight / 2, screenWidth / 2 + 100, screenHeight / 2 - 150);
+        circle.DrawDDA(500, 700, 30);
 
         // Casita con BRH
-        BRHsqueare(screenWidth / 2, screenHeight / 2, 200, 200);
-        BRHTriangle(400, 200, 300, 50, 200, 200);
-        BRHCircle(300, 500, 30, 0);
+        square.DrawBRH(screenWidth / 2, screenHeight / 2, 200, 200);
+        triangle.DrawBRH(400, 200, 300, 50, 200, 200);
+        circle.DrawBRH(300, 500, 30);
 
         // Coloreado
-        FillSquareBRH(screenWidth / 2, screenHeight / 2, 200, 200);
-        FillTriangleBRH(400, 200, 300, 50, 200, 200);
-        FillCircleBRH(300, 500, 30.f);
+        square.FillBRH(screenWidth / 2, screenHeight / 2, 200, 200);
+        triangle.FillBRH(400, 200, 300, 50, 200, 200);
+        circle.FillBRH(300, 500, 30.f);
 
-        FillSquareDDA(screenWidth / 2, screenHeight / 2, 600, 600);
-        FillTriangleDAA(screenWidth / 2, screenHeight / 2, screenWidth / 2 + 200, screenHeight / 2, screenWidth / 2 + 100, screenHeight / 2 - 150);
-        FillCircleDDA(500, 700, 30.f);
+        square.FillDDA(screenWidth / 2, screenHeight / 2, 600, 600);
+        triangle.FillDDA(screenWidth / 2, screenHeight / 2, screenWidth / 2 + 200, screenHeight / 2, screenWidth / 2 + 100, screenHeight / 2 - 150);
+        circle.FillDDA(500, 700, 30.f);
 
         EndDrawing();
     }
