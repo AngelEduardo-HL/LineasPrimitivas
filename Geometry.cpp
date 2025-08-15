@@ -25,6 +25,7 @@ Geometry::Traslacion(float tx, float ty)
 	return T;
 }
 
+// Multiplica dos matrices 3x3 y guarda el resultado en 'out'
 void Geometry::Mat3xMat3(const Mat3& a, const Mat3& b, Mat3& out)
 {
 	// Multiplicacion de matrices 3x3
@@ -36,10 +37,10 @@ void Geometry::Mat3xMat3(const Mat3& a, const Mat3& b, Mat3& out)
                          +a.m[i][1] * b.m[1][j] 
                          +a.m[i][2] * b.m[2][j];
         }
-    }
-			
+    }	
 }
 
+// Transforma un punto (x, y) usando una matriz de transformacion 3x3
 void Geometry::TransformPoint(const Mat3& T, int x, int y, int& outx, int& outy)
 {
 	// Multiplicar el punto (x, y, 1) por la matriz T
@@ -49,6 +50,49 @@ void Geometry::TransformPoint(const Mat3& T, int x, int y, int& outx, int& outy)
     outy = (int)(ty + 0.5f);
 
 }
+
+//------------------- Matriz de Rotacion ----------------
+Geometry::Mat3R
+
+
+Geometry::Rotacion(float angle)
+{
+	// Convertir grados a radianes
+	float rad = angle * (PI / 2);
+	float cosA = cosf(rad);
+	float sinA = sinf(rad);
+	// Matriz de rotacion 3x3
+	Mat3R R = { {
+		{cosA, -sinA, 0.0f},
+		{sinA,  cosA, 0.0f},
+		{0.0f,  0.0f, 1.0f}
+	} };
+	return R;
+}
+
+// Multiplica el origen de la figura por una matriz de rotacion 3
+void Geometry::Mat3xVec3(const Mat3R& R, const Mat3R& a, const Mat3R& b, Mat3R& out)
+{
+	// Multiplicacion de vector por matriz de rotacion 3x3
+    for (int i = 0; i < 3; ++i)
+    {
+        out.m[i][0] = R.m[i][0] * a.m[0][0] + R.m[i][1] * a.m[1][0] + R.m[i][2] * a.m[2][0];
+        out.m[i][1] = R.m[i][0] * b.m[0][1] + R.m[i][1] * b.m[1][1] + R.m[i][2] * b.m[2][1];
+        out.m[i][2] = 1.0f;
+    }
+}
+
+// Rota el centro de una figura (x, y) usando una matriz de rotacion 3x3
+void Geometry::RotacionPoint(const Mat3R& R, int x, int y, int& outx, int& outy)
+{
+	// Multiplicar el punto cenntral (x, y, 1) por la matriz de rotacion R
+	float tx = x * R.m[0][0] + y * R.m[1][0] + 1.0f * R.m[2][0];
+	float ty = x * R.m[0][1] + y * R.m[1][1] + 1.0f * R.m[2][1];
+	outx = (int)(tx + 0.5f);
+	outy = (int)(ty + 0.5f);
+}
+
+
 
 // ---------------- Lineas base ----------------
 void Geometry::DDALine(int X1, int Y1, int X2, int Y2, Color col)
