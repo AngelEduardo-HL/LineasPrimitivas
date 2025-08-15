@@ -16,6 +16,12 @@ public:
     void ClearPoints();
     void SavePoint(int x, int y);
 
+	//---- Matris de traslacion ----
+	struct Mat3 { float m[3][3]; }; // Matriz 3x3 para transformaciones 2D
+	static Mat3 Traslacion(float tx, float ty); // Matriz de traslacion
+	static void Mat3xMat3(const Mat3& a, const Mat3& b, Mat3& out); // Multiplicacion de matrices 3x3
+	static void TransformPoint(const Mat3& T, int x, int y, int& outx, int& outy); // Transformacion de punto con matriz 3x3
+
     // ---- Dibujo de lineas base ----
     void DDALine(int X1, int Y1, int X2, int Y2, Color col = GREEN);
     void BRHLine(int X1, int Y1, int X2, int Y2, Color col = YELLOW);

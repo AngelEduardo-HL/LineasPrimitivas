@@ -28,26 +28,38 @@ static void SaveCirclePerimeterPoints(Geometry& g, int cx, int cy, float radio)
     }
 }
 
-void Circulo::FillDDA(int cx, int cy, float r)
+void Circulo::FillDDA(const Geometry::Mat3& T, int cx, int cy, float r)
 {
-    SaveCirclePerimeterPoints(*this, cx, cy, r);
-    DDACircle((float)cx, (float)cy, r);
-    CircleScanlineY(cx, cy, (int)(r + 0.5f), GREEN);
+	// Transformar centro y radio
+	int x, y;
+	TransformPoint(T, cx, cy, x, y);
+    SaveCirclePerimeterPoints(*this, x, y, r);
+    DDACircle((float)x, (float)y, r);
+    CircleScanlineY(x, y, (int)(r + 0.5f), GREEN);
 }
 
-void Circulo::FillBRH(int cx, int cy, float r)
+void Circulo::FillBRH(const Geometry::Mat3& T, int cx, int cy, float r)
 {
-    SaveCirclePerimeterPoints(*this, cx, cy, r);
-    BRHCircle(cx, cy, r);
-    CircleScanlineY(cx, cy, (int)(r + 0.5f), YELLOW);
+	// Transformar centro y radio
+	int x, y;
+	TransformPoint(T, cx, cy, x, y);
+    SaveCirclePerimeterPoints(*this, x, y, r);
+    BRHCircle(x, y, r);
+    CircleScanlineY(x, y, (int)(r + 0.5f), YELLOW);
 }
 
-void Circulo::DrawDDA(int cx, int cy, float r)
+void Circulo::DrawDDA(const Geometry::Mat3& T, int cx, int cy, float r)
 {
-    DDACircle((float)cx, (float)cy, r);
+	// Transformar centro y radio
+	int x, y;
+	TransformPoint(T, cx, cy, x, y);
+    DDACircle((float)x, (float)y, r);
 }
 
-void Circulo::DrawBRH(int cx, int cy, float r)
+void Circulo::DrawBRH(const Geometry::Mat3& T, int cx, int cy, float r)
 {
-    BRHCircle(cx, cy, r);
+	// Transformar centro y radio
+	int x, y;
+	TransformPoint(T, cx, cy, x, y);
+    BRHCircle(x, y, r);
 }

@@ -11,6 +11,45 @@ void Geometry::SavePoint(int x, int y)
     pts.push_back({ x, y });
 }
 
+// ---------------- Matriz de Traslacion ----------------
+Geometry::Mat3
+
+Geometry::Traslacion(float tx, float ty)
+{
+	// Matriz identidad
+	Mat3 T = { {
+		{1.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{tx,   ty,   1.0f}
+	} };
+	return T;
+}
+
+void Geometry::Mat3xMat3(const Mat3& a, const Mat3& b, Mat3& out)
+{
+	// Multiplicacion de matrices 3x3
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+			out.m[i][j] = a.m[i][0] * b.m[0][j] 
+                         +a.m[i][1] * b.m[1][j] 
+                         +a.m[i][2] * b.m[2][j];
+        }
+    }
+			
+}
+
+void Geometry::TransformPoint(const Mat3& T, int x, int y, int& outx, int& outy)
+{
+	// Multiplicar el punto (x, y, 1) por la matriz T
+    float tx = x * T.m[0][0] + y * T.m[1][0] + 1.0f * T.m[2][0];
+    float ty = x * T.m[0][1] + y * T.m[1][1] + 1.0f * T.m[2][1];
+    outx = (int)(tx + 0.5f);
+    outy = (int)(ty + 0.5f);
+
+}
+
 // ---------------- Lineas base ----------------
 void Geometry::DDALine(int X1, int Y1, int X2, int Y2, Color col)
 {
