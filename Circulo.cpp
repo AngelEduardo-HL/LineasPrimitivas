@@ -5,7 +5,7 @@ static void SaveCirclePerimeterPoints(Geometry& g, int cx, int cy, float radio)
     g.ClearPoints();
     int r = (int)(radio + 0.5f);
     int x = 0, y = r;
-    int d = 1 - r;
+    int d = 1 - r; 
 
     auto save8 = [&](int xx, int yy)
         {
@@ -28,38 +28,55 @@ static void SaveCirclePerimeterPoints(Geometry& g, int cx, int cy, float radio)
     }
 }
 
-void Circulo::FillDDA(const Geometry::Mat3& T, int cx, int cy, float r)
+
+void Circulo::FillDDA(const Geometry::Mat3& M, int cx, int cy, float r)
 {
-	// Transformar centro y radio
+    //Escalamiento del rado
+	r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+	r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+
+	//Transforma, rota y escala el centro y radio
 	int x, y;
-	TransformPoint(T, cx, cy, x, y);
+	TransformPoint(M, cx, cy, x, y);
     SaveCirclePerimeterPoints(*this, x, y, r);
     DDACircle((float)x, (float)y, r);
     CircleScanlineY(x, y, (int)(r + 0.5f), GREEN);
 }
 
-void Circulo::FillBRH(const Geometry::Mat3& T, int cx, int cy, float r)
+void Circulo::FillBRH(const Geometry::Mat3& M, int cx, int cy, float r)
 {
+    //Escalamiento del rado
+    r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+    r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+
 	// Transformar centro y radio
 	int x, y;
-	TransformPoint(T, cx, cy, x, y);
+	TransformPoint(M, cx, cy, x, y);
     SaveCirclePerimeterPoints(*this, x, y, r);
     BRHCircle(x, y, r);
     CircleScanlineY(x, y, (int)(r + 0.5f), YELLOW);
 }
 
-void Circulo::DrawDDA(const Geometry::Mat3& T, int cx, int cy, float r)
+void Circulo::DrawDDA(const Geometry::Mat3& M, int cx, int cy, float r)
 {
+	// Escalamiento del radio
+    r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+    r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+
 	// Transformar centro y radio
 	int x, y;
-	TransformPoint(T, cx, cy, x, y);
+	TransformPoint(M, cx, cy, x, y);
     DDACircle((float)x, (float)y, r);
 }
 
-void Circulo::DrawBRH(const Geometry::Mat3& T, int cx, int cy, float r)
+void Circulo::DrawBRH(const Geometry::Mat3& M, int cx, int cy, float r)
 {
+    //Escalamiento del rado
+    r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+    r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+
 	// Transformar centro y radio
 	int x, y;
-	TransformPoint(T, cx, cy, x, y);
+	TransformPoint(M, cx, cy, x, y);
     BRHCircle(x, y, r);
 }

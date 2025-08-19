@@ -23,48 +23,61 @@ static void SaveTriangleEdgesPoints(Geometry & g, int X1, int Y1, int X2, int Y2
     saveLine(X3, Y3, X1, Y1);
 }
 
-void Triangulo::FillDDA(const Geometry::Mat3& T, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+void Triangulo::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
 {
-    int x1, y1, x2, y2, x3, y3;
-    TransformPoint(T, X1, Y1, x1, y1);
-    TransformPoint(T, X2, Y2, x2, y2);
-    TransformPoint(T, X3, Y3, x3, y3);
 
+	// Transformar los puntos del triángulo original
+    int x1, y1, x2, y2, x3, y3;
+    TransformPoint(M, X1, Y1, x1, y1);
+    TransformPoint(M, X2, Y2, x2, y2);
+    TransformPoint(M, X3, Y3, x3, y3);
+
+    // Evita que el relleno desaparezca con la rotacion
+    if (x1 == x2 || y1 == y2 || x3 == y3 || y1 == y2 || y2 == y3 || x2 == y3) return; // Evita relleno de lineas
+
+	// Guardar los bordes del triángulo transformado
     ClearPoints();
     SaveTriangleEdgesPoints(*this, x1, y1, x2, y2, x3, y3);
 
+	// Rellenar y dibujar contorno
     FillScanlineY(GREEN);
     DDATriangle(x1, y1, x2, y2, x3, y3);
 }
 
-void Triangulo::FillBRH(const Geometry::Mat3& T, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+void Triangulo::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
 {
-	int x1, y1, x2, y2, x3, y3;
-	TransformPoint(T, X1, Y1, x1, y1);
-	TransformPoint(T, X2, Y2, x2, y2);
-	TransformPoint(T, X3, Y3, x3, y3);
+	// Evita que el relleno desaparezca con la rotacion
+	if (X1 == X2 || Y1 == Y2 || X1 == X3 || Y1 == Y3 || X2 == X3 || Y2 == Y3) return; // Evita relleno de lineas
 
+	// Transformar los puntos del triángulo original
+	int x1, y1, x2, y2, x3, y3;
+	TransformPoint(M, X1, Y1, x1, y1);
+	TransformPoint(M, X2, Y2, x2, y2);
+	TransformPoint(M, X3, Y3, x3, y3);
+
+	// Guardar los bordes del triángulo transformado
     ClearPoints();
     SaveTriangleEdgesPoints(*this, x1, y1, x2, y2, x3, y3);
 
+	// Rellenar y dibujar contorno
     FillScanlineY(YELLOW);
     BRHTriangle(x1, y1, x2, y2, x3, y3);
 }
 
-void Triangulo::DrawDDA(const Geometry::Mat3& T, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+void Triangulo::DrawDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
 {
     int x1, y1, x2, y2, x3, y3;
-    TransformPoint(T, X1, Y1, x1, y1);
-    TransformPoint(T, X2, Y2, x2, y2);
-    TransformPoint(T, X3, Y3, x3, y3);
+    TransformPoint(M, X1, Y1, x1, y1);
+    TransformPoint(M, X2, Y2, x2, y2);
+    TransformPoint(M, X3, Y3, x3, y3);
     DDATriangle(x1, y1, x2, y2, x3, y3);
 }
 
-void Triangulo::DrawBRH(const Geometry::Mat3& T, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+void Triangulo::DrawBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
 {
     int x1, y1, x2, y2, x3, y3;
-    TransformPoint(T, X1, Y1, x1, y1);
-    TransformPoint(T, X2, Y2, x2, y2);
-    TransformPoint(T, X3, Y3, x3, y3);
+    TransformPoint(M, X1, Y1, x1, y1);
+    TransformPoint(M, X2, Y2, x2, y2);
+    TransformPoint(M, X3, Y3, x3, y3);
     BRHTriangle(x1, y1, x2, y2, x3, y3);
 }

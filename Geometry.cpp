@@ -60,8 +60,8 @@ Geometry::Mat3 Geometry::Rotacion(float grados)
     float s = sinf(rad);
 
     Mat3 R = { {
-        {  c,   s, 0.0f },   // columna x'
-        { -s,   c, 0.0f },   // columna y'
+        {  c,   s, 0.0f },   // columna x
+        { -s,   c, 0.0f },   // columna y
         { 0.0f, 0.0f, 1.0f }
     } };
     return R;
@@ -69,7 +69,7 @@ Geometry::Mat3 Geometry::Rotacion(float grados)
 
 Geometry::Mat3 Geometry::RotacionPivote(float grados, float cx, float cy)
 {
-    Mat3 A = Traslacion(-cx, -cy);
+     Mat3 A = Traslacion(-cx, -cy);
     Mat3 B = Rotacion(grados);
     Mat3 C = Traslacion(cx, cy);
 
@@ -101,6 +101,7 @@ Geometry::Mat3 Geometry::EscalaPivote(float sx, float sy, float cx, float cy)
 	return ABC;
 }
 
+// ---------------- Matriz compuesta TRS ----------------
 Geometry::Mat3 Geometry::TRS(float tx, float ty, float grados, float sx, float sy, float px, float py)
 {
 	Mat3 T = Traslacion(tx, ty);
