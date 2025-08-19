@@ -16,17 +16,23 @@ public:
     void ClearPoints();
     void SavePoint(int x, int y);
 
+    struct Mat3 { float m[3][3]; }; // Matriz 3x3 para transformaciones 2D
+    static Mat3 TRS(float tx, float ty, float grados, float sx, float sy, float px, float py);
+
 	//---- Matris de traslacion ----
-	struct Mat3 { float m[3][3]; }; // Matriz 3x3 para transformaciones 2D
 	static Mat3 Traslacion(float tx, float ty); // Matriz de traslacion
 	static void Mat3xMat3(const Mat3& a, const Mat3& b, Mat3& out); // Multiplicacion de matrices 3x3
 	static void TransformPoint(const Mat3& T, int x, int y, int& outx, int& outy); // Transformacion de punto con matriz 3x3
 
 	//---- Matriz de rotacion ----
-	struct Mat3R { float m[3][3]; }; // Matriz 3x3 para rotacion
-	static Mat3R Rotacion(float angle); // Matriz de rotacion
-    static void Mat3xVec3(const Mat3R& R, const Mat3R& a, const Mat3R& b, Mat3R& out); // Multiplicacion de vector por matriz de rotacion
-	static void RotacionPoint(const Mat3R& R, int x, int y, int& outx, int& outy); // Rotacion de punto con matriz de rotacion
+    static Mat3 Rotacion(float grados);             
+    static Mat3 RotacionPivote(float grados, float cx, float cy);
+
+	//---- Matriz de Escalado ----
+	static Mat3 Escala(float sx, float sy); // Matriz de escalado
+    static Mat3 EscalaPivote(float sx, float sy, float cx, float cy);
+
+
 
     // ---- Dibujo de lineas base ----
     void DDALine(int X1, int Y1, int X2, int Y2, Color col = GREEN);

@@ -52,47 +52,65 @@ void Geometry::TransformPoint(const Mat3& T, int x, int y, int& outx, int& outy)
 }
 
 //------------------- Matriz de Rotacion ----------------
-Geometry::Mat3R
-
-
-Geometry::Rotacion(float angle)
+Geometry::Mat3 Geometry::Rotacion(float grados)
 {
-	// Convertir grados a radianes
-	float rad = angle * (PI / 2);
-	float cosA = cosf(rad);
-	float sinA = sinf(rad);
-	// Matriz de rotacion 3x3
-	Mat3R R = { {
-		{cosA, -sinA, 0.0f},
-		{sinA,  cosA, 0.0f},
-		{0.0f,  0.0f, 1.0f}
+    // grados -> radianes
+    float rad = grados * (PI / 180.0f);
+    float c = cosf(rad);
+    float s = sinf(rad);
+
+    Mat3 R = { {
+        {  c,   s, 0.0f },   // columna x'
+        { -s,   c, 0.0f },   // columna y'
+        { 0.0f, 0.0f, 1.0f }
+    } };
+    return R;
+}
+
+Geometry::Mat3 Geometry::RotacionPivote(float grados, float cx, float cy)
+{
+    Mat3 A = Traslacion(-cx, -cy);
+    Mat3 B = Rotacion(grados);
+    Mat3 C = Traslacion(cx, cy);
+
+    Mat3 AB, ABC;
+    Mat3xMat3(A, B, AB);
+    Mat3xMat3(AB, C, ABC);
+    return ABC;
+}
+// ---------------- Matriz de Escalado ----------------
+Geometry::Mat3 Geometry::Escala(float sx, float sy)
+{
+	Mat3 S = { {
+		{ sx, 0.0f, 0.0f },
+		{ 0.0f, sy, 0.0f },
+		{ 0.0f, 0.0f, 1.0f }
 	} };
-	return R;
+	return S;
 }
 
-// Multiplica el origen de la figura por una matriz de rotacion 3
-void Geometry::Mat3xVec3(const Mat3R& R, const Mat3R& a, const Mat3R& b, Mat3R& out)
+Geometry::Mat3 Geometry::EscalaPivote(float sx, float sy, float cx, float cy)
 {
-	// Multiplicacion de vector por matriz de rotacion 3x3
-    for (int i = 0; i < 3; ++i)
-    {
-        out.m[i][0] = R.m[i][0] * a.m[0][0] + R.m[i][1] * a.m[1][0] + R.m[i][2] * a.m[2][0];
-        out.m[i][1] = R.m[i][0] * b.m[0][1] + R.m[i][1] * b.m[1][1] + R.m[i][2] * b.m[2][1];
-        out.m[i][2] = 1.0f;
-    }
+	Mat3 A = Traslacion(-cx, -cy);
+	Mat3 B = Escala(sx, sy);
+	Mat3 C = Traslacion(cx, cy);
+	Mat3 AB, ABC;
+
+	Mat3xMat3(A, B, AB);
+	Mat3xMat3(AB, C, ABC);
+	return ABC;
 }
 
-// Rota el centro de una figura (x, y) usando una matriz de rotacion 3x3
-void Geometry::RotacionPoint(const Mat3R& R, int x, int y, int& outx, int& outy)
+Geometry::Mat3 Geometry::TRS(float tx, float ty, float grados, float sx, float sy, float px, float py)
 {
-	// Multiplicar el punto cenntral (x, y, 1) por la matriz de rotacion R
-	float tx = x * R.m[0][0] + y * R.m[1][0] + 1.0f * R.m[2][0];
-	float ty = x * R.m[0][1] + y * R.m[1][1] + 1.0f * R.m[2][1];
-	outx = (int)(tx + 0.5f);
-	outy = (int)(ty + 0.5f);
+	Mat3 T = Traslacion(tx, ty);
+	Mat3 R = RotacionPivote(grados, px, py);
+	Mat3 S = EscalaPivote(sx, sy, px, py);
+	Mat3 TR, TRS;
+	Mat3xMat3(T, R, TR);
+	Mat3xMat3(TR, S, TRS);
+	return TRS;
 }
-
-
 
 // ---------------- Lineas base ----------------
 void Geometry::DDALine(int X1, int Y1, int X2, int Y2, Color col)
