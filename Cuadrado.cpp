@@ -19,6 +19,9 @@ static void SaveLineDDA(Geometry& g, int X1, int Y1, int X2, int Y2)
 
 void Cuadrado::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
 {
+    //Evita que el relleno desaparezca con la rotacion
+	if (X1 == X2 || Y1 == Y2) return; // Evita relleno de lineas
+
     //Transformar las 4 esquinas del rectángulo original
     int ax, ay, bx, by, cx, cy, dx, dy;
     TransformPoint(M, X1, Y1, ax, ay); // A: arriba-izq
@@ -43,18 +46,24 @@ void Cuadrado::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
 
 void Cuadrado::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
 {
+	// Evita que el relleno desaparezca con la rotacion
+	if (X1 == X2 || Y1 == Y2) return; // Evita relleno de lineas
+
+	// Transformar las 4 esquinas del rectángulo original
     int ax, ay, bx, by, cx, cy, dx, dy;
     TransformPoint(M, X1, Y1, ax, ay);
     TransformPoint(M, X2, Y1, bx, by);
     TransformPoint(M, X2, Y2, cx, cy);
     TransformPoint(M, X1, Y2, dx, dy);
 
+	// Guardar bordes rotados/escalados con BRH
     ClearPoints();
     SaveLineDDA(*this, ax, ay, bx, by);
     SaveLineDDA(*this, bx, by, cx, cy);
     SaveLineDDA(*this, cx, cy, dx, dy);
     SaveLineDDA(*this, dx, dy, ax, ay);
 
+	// Rellenar y dibujar contorno
     FillScanlineY(YELLOW);
     BRHLine(ax, ay, bx, by);
     BRHLine(bx, by, cx, cy);

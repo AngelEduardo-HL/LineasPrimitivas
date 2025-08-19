@@ -31,7 +31,7 @@ int main(void)
         ClearBackground(BLACK);
 
         // Rotación animada
-        float ang = GetTime() * 30.0f;
+        float ang = GetTime() * 40.0f;
 
         // Escala (uniforme para que el círculo no se vuelva elipse)
         float sx = 1.0f + 0.25f * sinf(GetTime() * 2.0f);
@@ -52,7 +52,7 @@ int main(void)
         // Círculo DDA
         int ccx = 500, ccy = 700; float rr = 30.f;
 
-        // BRH
+		//----- BRH -----
 
         // Cuadrado
         int bx1 = screenWidth / 2, by1 = screenHeight / 2;
@@ -95,7 +95,7 @@ int main(void)
         Geometry::Mat3 SBRH_T = Geometry::EscalaPivote(sx, sy, pivTbx, pivTby);
         Geometry::Mat3 SBRH_C = Geometry::EscalaPivote(sx, sy, pivCbx, pivCby);
 
-        // ======= Composición (vector-fila): M = S * R * T =======
+        // ======= Composición =======
         Geometry::Mat3 SR;
 
         Geometry::Mat3 M_DDA_S, M_DDA_T, M_DDA_C;
