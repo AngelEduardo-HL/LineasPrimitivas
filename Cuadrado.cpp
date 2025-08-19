@@ -1,76 +1,91 @@
 #include "Cuadrado.h"
 
-void Cuadrado::FillDDA(const Geometry::Mat3& T, const Geometry::Mat3R& R,int X1, int Y1, int X2, int Y2)
+// DDA para muestrear un segmento y guardar puntos de borde (sirve al scanline Y)
+static void SaveLineDDA(Geometry& g, int X1, int Y1, int X2, int Y2)
 {
-    // Transformar esquinas
-    int x1, y1, x2, y2;
-    TransformPoint(T, X1, Y1, x1, y1);
-    TransformPoint(T, X2, Y2, x2, y2);
+    float dx = X2 - X1, dy = Y2 - Y1;
+    float adx = (dx < 0) ? -dx : dx, ady = (dy < 0) ? -dy : dy;
+    int steps = (int)((adx > ady) ? adx : ady);
+    if (steps <= 0) { g.SavePoint(X1, Y1); return; }
 
-	//Rotar punto central
-	RotacionPoint(R, (x1 + x2) / 2, (y1 + y2) / 2, x1, y1);
-	RotacionPoint(R, (x1 + x2) / 2, (y1 + y2) / 2, x2, y2);
-
-    ClearPoints();
-
-	// Guardar puntos del borde trasladados y rotados
-    int Xmin = (x1 < x2) ? x1 : x2;
-    int Xmax = (x1 > x2) ? x1 : x2;
-    int Ymin = (y1 < y2) ? y1 : y2;
-    int Ymax = (y1 > y2) ? y1 : y2;
-
-    for (int x = Xmin; x <= Xmax; ++x) {
-        SavePoint(x, Ymin);
-        SavePoint(x, Ymax);
+    float xInc = dx / steps, yInc = dy / steps;
+    float x = (float)X1, y = (float)Y1;
+    for (int i = 0; i <= steps; ++i)
+    {
+        g.SavePoint((int)(x + 0.5f), (int)(y + 0.5f));
+        x += xInc; y += yInc;
     }
-    for (int y = Ymin; y <= Ymax; ++y) {
-        SavePoint(Xmin, y);
-        SavePoint(Xmax, y);
-    }
-
-	// Relleno y contorno en la posición trasladada y rotada
-    FillScanlineY(GREEN);
-    DDASquare(x1, y1, x2, y2);
 }
 
-void Cuadrado::FillBRH(const Geometry::Mat3& T, const Geometry::Mat3R& R, int X1, int Y1, int X2, int Y2)
+void Cuadrado::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
 {
-    int x1, y1, x2, y2;
-    TransformPoint(T, X1, Y1, x1, y1);
-    TransformPoint(T, X2, Y2, x2, y2);
+    //Transformar las 4 esquinas del rectángulo original
+    int ax, ay, bx, by, cx, cy, dx, dy;
+    TransformPoint(M, X1, Y1, ax, ay); // A: arriba-izq
+    TransformPoint(M, X2, Y1, bx, by); // B: arriba-der
+    TransformPoint(M, X2, Y2, cx, cy); // C: abajo-der
+    TransformPoint(M, X1, Y2, dx, dy); // D: abajo-izq
+
+    //Guardar bordes rotados/escalados con DDA
+    ClearPoints();
+    SaveLineDDA(*this, ax, ay, bx, by);
+    SaveLineDDA(*this, bx, by, cx, cy);
+    SaveLineDDA(*this, cx, cy, dx, dy);
+    SaveLineDDA(*this, dx, dy, ax, ay);
+
+    //Rellenar y dibujar contorno
+    FillScanlineY(GREEN);
+    DDALine(ax, ay, bx, by);
+    DDALine(bx, by, cx, cy);
+    DDALine(cx, cy, dx, dy);
+    DDALine(dx, dy, ax, ay);
+}
+
+void Cuadrado::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
+{
+    int ax, ay, bx, by, cx, cy, dx, dy;
+    TransformPoint(M, X1, Y1, ax, ay);
+    TransformPoint(M, X2, Y1, bx, by);
+    TransformPoint(M, X2, Y2, cx, cy);
+    TransformPoint(M, X1, Y2, dx, dy);
 
     ClearPoints();
-
-    int Xmin = (x1 < x2) ? x1 : x2;
-    int Xmax = (x1 > x2) ? x1 : x2;
-    int Ymin = (y1 < y2) ? y1 : y2;
-    int Ymax = (y1 > y2) ? y1 : y2;
-
-    for (int x = Xmin; x <= Xmax; ++x) {
-        SavePoint(x, Ymin);
-        SavePoint(x, Ymax);
-    }
-    for (int y = Ymin; y <= Ymax; ++y) {
-        SavePoint(Xmin, y);
-        SavePoint(Xmax, y);
-    }
+    SaveLineDDA(*this, ax, ay, bx, by);
+    SaveLineDDA(*this, bx, by, cx, cy);
+    SaveLineDDA(*this, cx, cy, dx, dy);
+    SaveLineDDA(*this, dx, dy, ax, ay);
 
     FillScanlineY(YELLOW);
-    BRHSquare(x1, y1, x2, y2);
+    BRHLine(ax, ay, bx, by);
+    BRHLine(bx, by, cx, cy);
+    BRHLine(cx, cy, dx, dy);
+    BRHLine(dx, dy, ax, ay);
 }
 
-void Cuadrado::DrawDDA(const Geometry::Mat3& T, const Geometry::Mat3R& R, int X1, int Y1, int X2, int Y2)
+void Cuadrado::DrawDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
 {
-    int x1, y1, x2, y2;
-    TransformPoint(T, X1, Y1, x1, y1);
-    TransformPoint(T, X2, Y2, x2, y2);
-    DDASquare(x1, y1, x2, y2);
+    int ax, ay, bx, by, cx, cy, dx, dy;
+    TransformPoint(M, X1, Y1, ax, ay);
+    TransformPoint(M, X2, Y1, bx, by);
+    TransformPoint(M, X2, Y2, cx, cy);
+    TransformPoint(M, X1, Y2, dx, dy);
+
+    DDALine(ax, ay, bx, by);
+    DDALine(bx, by, cx, cy);
+    DDALine(cx, cy, dx, dy);
+    DDALine(dx, dy, ax, ay);
 }
 
-void Cuadrado::DrawBRH(const Geometry::Mat3& T, const Geometry::Mat3R& R, int X1, int Y1, int X2, int Y2)
+void Cuadrado::DrawBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
 {
-    int x1, y1, x2, y2;
-    TransformPoint(T, X1, Y1, x1, y1);
-    TransformPoint(T, X2, Y2, x2, y2);
-    BRHSquare(x1, y1, x2, y2);
+    int ax, ay, bx, by, cx, cy, dx, dy;
+    TransformPoint(M, X1, Y1, ax, ay);
+    TransformPoint(M, X2, Y1, bx, by);
+    TransformPoint(M, X2, Y2, cx, cy);
+    TransformPoint(M, X1, Y2, dx, dy);
+
+    BRHLine(ax, ay, bx, by);
+    BRHLine(bx, by, cx, cy);
+    BRHLine(cx, cy, dx, dy);
+    BRHLine(dx, dy, ax, ay);
 }
