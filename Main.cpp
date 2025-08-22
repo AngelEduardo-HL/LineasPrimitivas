@@ -34,7 +34,7 @@ int main(void)
         float ang = GetTime() * 30.0f;
 
         // Escala
-        float sx = 1.0f + 0.25f * sinf(GetTime() * 0);
+        float sx = 1.0f + 0.25f * sinf(GetTime() * 2.0f);
         float sy = sx;
 
         // ---- Coordenadas originales ----

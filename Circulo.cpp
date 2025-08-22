@@ -32,8 +32,8 @@ static void SaveCirclePerimeterPoints(Geometry& g, int cx, int cy, float radio)
 void Circulo::FillDDA(const Geometry::Mat3& M, int cx, int cy, float r)
 {
     //Escalamiento del rado
-	//r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
-	//r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+	r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+	r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
 
 	//Rotacion del radio
 	r *= sqrtf(M.m[0][0] * M.m[0][0] + M.m[1][0] * M.m[1][0]); // Rotacion del radio
@@ -50,8 +50,8 @@ void Circulo::FillDDA(const Geometry::Mat3& M, int cx, int cy, float r)
 void Circulo::FillBRH(const Geometry::Mat3& M, int cx, int cy, float r)
 {
     //Escalamiento del rado
-    //r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
-    //r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+    r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+    r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
 
 	//Rotacion del radio
     r *= sqrtf(M.m[0][0] * M.m[0][0] + M.m[1][0] * M.m[1][0]); // Rotacion del radio
@@ -68,8 +68,8 @@ void Circulo::FillBRH(const Geometry::Mat3& M, int cx, int cy, float r)
 void Circulo::DrawDDA(const Geometry::Mat3& M, int cx, int cy, float r)
 {
 	// Escalamiento del radio
-    //r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
-    //r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+    r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+    r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
 
 	// Rotacion del radio
     r *= sqrtf(M.m[0][0] * M.m[0][0] + M.m[1][0] * M.m[1][0]); // Rotacion del radio
@@ -84,8 +84,8 @@ void Circulo::DrawDDA(const Geometry::Mat3& M, int cx, int cy, float r)
 void Circulo::DrawBRH(const Geometry::Mat3& M, int cx, int cy, float r)
 {
     //Escalamiento del rado
-    //r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
-    //r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
+    r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
+    r *= (M.m[1][1] + M.m[0][0]); // Escala hacia afuera
 
 	//Rotacion del radio
     r *= sqrtf(M.m[0][0] * M.m[0][0] + M.m[1][0] * M.m[1][0]); // Rotacion del radio
