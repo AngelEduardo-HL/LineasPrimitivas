@@ -32,8 +32,6 @@ public:
 	static Mat3 Escala(float sx, float sy); // Matriz de escalado
     static Mat3 EscalaPivote(float sx, float sy, float cx, float cy);
 
-
-
     // ---- Dibujo de lineas base ----
     void DDALine(int X1, int Y1, int X2, int Y2, Color col = GREEN);
     void BRHLine(int X1, int Y1, int X2, int Y2, Color col = YELLOW);

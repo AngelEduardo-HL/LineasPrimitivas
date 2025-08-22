@@ -31,10 +31,10 @@ int main(void)
         ClearBackground(BLACK);
 
         // Rotación animada
-        float ang = GetTime() * 40.0f;
+        float ang = GetTime() * 30.0f;
 
-        // Escala (uniforme para que el círculo no se vuelva elipse)
-        float sx = 1.0f + 0.25f * sinf(GetTime() * 2.0f);
+        // Escala
+        float sx = 1.0f + 0.25f * sinf(GetTime() * 0);
         float sy = sx;
 
         // ---- Coordenadas originales ----
@@ -52,7 +52,7 @@ int main(void)
         // Círculo DDA
         int ccx = 500, ccy = 700; float rr = 30.f;
 
-		//----- BRH -----
+        // BRH
 
         // Cuadrado
         int bx1 = screenWidth / 2, by1 = screenHeight / 2;
@@ -66,7 +66,7 @@ int main(void)
         // Círculo BRH
         int bcx = 300, bcy = 500; float brr = 30.f;
 
-        // ======= Pivotes (centros/centroides) =======
+        // ======= Pivotes =======
         // DDA
         float pivSx = (sx1 + sx2) * 0.5f, pivQy = (sy1 + sy2) * 0.5f;                       // centro cuadrado DDA
         float pivTx = (tdx1 + tdx2 + tdx3) / 3.0f, pivTy = (tdy1 + tdy2 + tdy3) / 3.0f;     // centroide triángulo DDA
