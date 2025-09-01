@@ -2,8 +2,6 @@
 #include "Ball.h"
 #include <cmath>
 
-static inline float Len(float x, float y) { return std::sqrtf(x * x + y * y); }
-
 bool Target::CheckCollision(const Ball& b, CollisionInfo& info)
 {
     float dx = b.tx - tx, dy = b.ty - ty;
@@ -28,7 +26,7 @@ void Target::OnCollision(Ball& b, const CollisionInfo& info)
     b.tx += info.nx * info.penetration;
     b.ty += info.ny * info.penetration;
 
-    // rebote con restitución > 1 (para “empujón”)
+    // refleja con su restitución
     float vn = b.vx * info.nx + b.vy * info.ny;
     b.vx = b.vx - (1.0f + restitution) * vn * info.nx;
     b.vy = b.vy - (1.0f + restitution) * vn * info.ny;

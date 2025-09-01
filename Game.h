@@ -5,9 +5,16 @@
 #include "Target.h"
 #include "BallShooter.h"
 #include "OutHole.h"
-#include "Cuadrado.h"
 #include "Triangulo.h"
-#include "Circulo.h"
+
+struct TriDeflector {
+    int x1, y1, x2, y2, x3, y3;
+    float restitution{ 0.75f };
+    void Draw(Triangulo& tr) const {
+        Geometry::Mat3 I = Geometry::Traslacion(0, 0);
+        tr.DrawBRH(I, x1, y1, x2, y2, x3, y3);
+    }
+};
 
 class Game {
 public:
@@ -20,29 +27,24 @@ public:
 private:
     int W, H;
 
-    // Entidades
     Ball ball;
     Flipper left, right;
-    std::vector<Target> targets;
+    std::vector<Target> targets;   // incluye bumpers (score=0, grises)
+    std::vector<TriDeflector> tris;
+
     BallShooter shooter;
     OutHole out;
+    Triangulo tr; // para dibujar tris
 
-    // Dibujadores extra (si quieres usar tus figuras para elementos del tablero)
-    Cuadrado sq;
-    Triangulo tr;
-    Circulo  ci;
-
-    // Físicas
     float gravity = 900.f;
-    float wallRest = 0.70f;
     float friction = 0.995f;
 
-    // Estado
     int score = 0;
     int lives = 3;
 
-    // helpers
-    void CollideWalls();
+    // colisiones
+    void CollideBorders();     // <-- solo bordes del campo
     void CollideFlippers();
     void CollideTargets();
+    void CollideTriangles();
 };

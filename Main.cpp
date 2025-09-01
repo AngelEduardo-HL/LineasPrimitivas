@@ -1,6 +1,5 @@
 #include <iostream>
 #include "raylib.h"
-
 #include "Game.h"
 
 int main(void)
@@ -8,7 +7,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 800;
 
-    InitWindow(screenWidth, screenHeight, "GigaChadWindow - Pinball");
+    InitWindow(screenWidth, screenHeight, "Pinball BRH");
     SetTargetFPS(60);
 
     Game game(screenWidth, screenHeight);
@@ -16,7 +15,6 @@ int main(void)
     while (!WindowShouldClose())
     {
         float dt = GetFrameTime();
-
         BeginDrawing();
         game.Update(dt);
         game.Draw();

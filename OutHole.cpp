@@ -10,7 +10,5 @@ bool OutHole::Check(const Ball& b) const
 
 void OutHole::Draw()
 {
-    DrawRectangle((int)area.x, (int)area.y,
-        (int)area.width, (int)area.height,
-        Color{ 120, 20, 20, 220 });
+    DrawRectangle((int)area.x, (int)area.y, (int)area.width, (int)area.height, RED);
 }

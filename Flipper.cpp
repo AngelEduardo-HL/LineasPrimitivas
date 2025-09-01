@@ -1,8 +1,8 @@
 #include "Flipper.h"
 #include "Ball.h"
+#include "raylib.h"
 #include <cmath>
 
-static inline float Dot(float ax, float ay, float bx, float by) { return ax * bx + ay * by; }
 static inline float Clamp(float v, float lo, float hi) { return (v < lo) ? lo : ((v > hi) ? hi : v); }
 static inline float Len(float x, float y) { return std::sqrtf(x * x + y * y); }
 
@@ -18,25 +18,55 @@ static float DistPointSeg(float px, float py, float ax, float ay, float bx, floa
     return std::sqrtf(dx * dx + dy * dy);
 }
 
+void Flipper::Update(float dt)
+{
+    float target = pressed ? hitAngle : restAngle;
+    if (rotDeg < target) { rotDeg += speed * dt; if (rotDeg > target) rotDeg = target; }
+    else if (rotDeg > target) { rotDeg -= speed * dt; if (rotDeg < target) rotDeg = target; }
+}
+
+void Flipper::Draw()
+{
+    // Visual: rectángulo sólido con color (raylib) para que sí tenga color
+    Rectangle rec{ px, py - width * 0.5f, length, width };
+    DrawRectanglePro(rec, Vector2{ px, py }, rotDeg, color);
+
+    // (Opcional) perfilar con tus líneas BRH para “sabor” retro
+    int X1 = (int)(px + 0.5f);
+    int Y1 = (int)(py - width * 0.5f + 0.5f);
+    int X2 = (int)(px + length + 0.5f);
+    int Y2 = (int)(py + width * 0.5f + 0.5f);
+    drawer.DrawBRH(BuildM(), X1, Y1, X2, Y2);
+}
+
+void Flipper::Segment(float& ax, float& ay, float& bx, float& by) const
+{
+    Geometry::Mat3 M = const_cast<Flipper*>(this)->BuildM();
+    int Axi = (int)(px + 0.5f), Ayi = (int)(py + 0.5f);
+    int Bxi = (int)(px + length + 0.5f), Byi = (int)(py + 0.5f);
+    int Axr, Ayr, Bxr, Byr;
+    Geometry::TransformPoint(M, Axi, Ayi, Axr, Ayr);
+    Geometry::TransformPoint(M, Bxi, Byi, Bxr, Byr);
+    ax = (float)Axr; ay = (float)Ayr; bx = (float)Bxr; by = (float)Byr;
+}
+
 bool Flipper::CheckCollision(const Ball& b, CollisionInfo& info)
 {
     float ax, ay, bx, by; Segment(ax, ay, bx, by);
     float qx, qy;
     float d = DistPointSeg(b.tx, b.ty, ax, ay, bx, by, qx, qy);
 
-    // Añadimos "slop" para estabilizar (2 px)
     const float slop = 2.0f;
-    float rad = b.r + width * 0.5f + slop;  // cápsula más gruesa
+    float rad = b.r + width * 0.5f + slop;
 
     if (d < rad)
     {
-        // normal desde el segmento hacia la bola
         float nx = b.tx - qx, ny = b.ty - qy;
         float nlen = Len(nx, ny); if (nlen < 1e-4f) return false;
         nx /= nlen; ny /= nlen;
 
         info.nx = nx; info.ny = ny;
-        info.penetration = rad - d;   // incluye slop
+        info.penetration = rad - d;
         info.cx = qx; info.cy = qy;
         return true;
     }
@@ -45,19 +75,16 @@ bool Flipper::CheckCollision(const Ball& b, CollisionInfo& info)
 
 void Flipper::OnCollision(Ball& b, const CollisionInfo& info)
 {
-    // Corrige penetración
     b.tx += info.nx * info.penetration;
     b.ty += info.ny * info.penetration;
 
-    // Reflejo con restitución fuerte
     const float restitution = 0.95f;
     float vn = b.vx * info.nx + b.vy * info.ny;
     b.vx = b.vx - (1.0f + restitution) * vn * info.nx;
     b.vy = b.vy - (1.0f + restitution) * vn * info.ny;
 
-    // Impulso extra si está presionado
     if (pressed) {
-        const float bonus = 160.f; // un poco más
+        const float bonus = 180.f;
         b.vx += info.nx * bonus;
         b.vy += info.ny * bonus;
     }
