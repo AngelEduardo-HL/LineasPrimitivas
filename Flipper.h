@@ -4,18 +4,16 @@
 
 class Flipper : public GameObject {
 public:
-    float length{150.f};
-    float width{20.f};
+    float length{ 150.f };
+    float width{ 20.f };
 
-    // Como antes: reposo ARRIBA, al presionar BAJAN
-    float restAngle{ -25.f };   // izq: -25; der: +25 (ver constructor en Game.cpp)
-    float hitAngle  {  30.f };  // izq: +30; der: -30
-    float speed{600.f};
-    bool  pressed{false};
+    // Versión que funcionaba: reposo ARRIBA, al presionar BAJA
+    float restAngle{ -25.f };   // izq: -25 ; der: +25 (ver Game.cpp)
+    float hitAngle{ 30.f };   // izq: +30 ; der: -30
+    float speed{ 600.f };
+    bool  pressed{ false };
 
-    // color visual del flipper
-    Color color{ BLUE };
-
+    Color color{ BLUE };      // color visual
     Cuadrado drawer;
 
     void Update(float dt) override;

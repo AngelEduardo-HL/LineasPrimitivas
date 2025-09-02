@@ -14,10 +14,9 @@ void BallShooter::Update(float dt)
 
 void BallShooter::Draw()
 {
-    // canal
     DrawRectangleLines((int)area.x, (int)area.y, (int)area.width, (int)area.height, BLACK);
 
-    // pistón (rectángulo BRH que baja al comprimir)
+    // pistón (BRH) que baja al comprimir
     const float pistonH = 80.0f;
     float pistonY = area.y + comp * (area.height - pistonH);
 
@@ -43,17 +42,19 @@ void BallShooter::ApplyToBall(Ball& b)
 {
     if (!ContainsBall(b)) return;
 
-    // centra X
     float cx = area.x + area.width * 0.5f;
     b.tx = cx;
 
-    // cara superior del pistón
     const float pistonH = 80.0f;
     float pistonY = area.y + comp * (area.height - pistonH);
     float topFaceY = pistonY;
 
-    float minBallY = topFaceY - (b.r + 1.0f);
-    if (b.ty > minBallY) { b.ty = minBallY; if (b.vy > 0.0f) b.vy = 0.0f; }
+    // clamp: bola por encima del pistón y dentro del canal
+    float minBallY = std::max(area.y + b.r, topFaceY - b.r);
+    if (b.ty > minBallY) {
+        b.ty = minBallY;
+        if (b.vy > 0.0f) b.vy = 0.0f;
+    }
 
     // impulso al descomprimir
     if (releasing && prevComp > comp) {

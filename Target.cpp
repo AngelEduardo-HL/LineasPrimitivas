@@ -22,11 +22,9 @@ bool Target::CheckCollision(const Ball& b, CollisionInfo& info)
 
 void Target::OnCollision(Ball& b, const CollisionInfo& info)
 {
-    // separa
     b.tx += info.nx * info.penetration;
     b.ty += info.ny * info.penetration;
 
-    // refleja con su restitución
     float vn = b.vx * info.nx + b.vy * info.ny;
     b.vx = b.vx - (1.0f + restitution) * vn * info.nx;
     b.vy = b.vy - (1.0f + restitution) * vn * info.ny;

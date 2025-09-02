@@ -27,11 +27,11 @@ void Flipper::Update(float dt)
 
 void Flipper::Draw()
 {
-    // Visual: rectángulo sólido con color (raylib) para que sí tenga color
+    // Relleno de color (raylib) para dar color al flipper
     Rectangle rec{ px, py - width * 0.5f, length, width };
     DrawRectanglePro(rec, Vector2{ px, py }, rotDeg, color);
 
-    // (Opcional) perfilar con tus líneas BRH para “sabor” retro
+    // Perfil con tus líneas BRH
     int X1 = (int)(px + 0.5f);
     int Y1 = (int)(py - width * 0.5f + 0.5f);
     int X2 = (int)(px + length + 0.5f);
