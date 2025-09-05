@@ -27,16 +27,15 @@ void Flipper::Update(float dt)
 
 void Flipper::Draw()
 {
-    // Relleno de color (raylib) para dar color al flipper
+    // Relleno de color para dar color al flipper
     Rectangle rec{ px, py - width * 0.5f, length, width };
-    DrawRectanglePro(rec, Vector2{ px, py }, rotDeg, color);
 
-    // Perfil con tus líneas BRH
+    // Perfil con líneas BRH
     int X1 = (int)(px + 0.5f);
     int Y1 = (int)(py - width * 0.5f + 0.5f);
     int X2 = (int)(px + length + 0.5f);
     int Y2 = (int)(py + width * 0.5f + 0.5f);
-    drawer.DrawBRH(BuildM(), X1, Y1, X2, Y2);
+    drawer.FillBRH(BuildM(), X1, Y1, X2, Y2, color);
 }
 
 void Flipper::Segment(float& ax, float& ay, float& bx, float& by) const
@@ -56,8 +55,8 @@ bool Flipper::CheckCollision(const Ball& b, CollisionInfo& info)
     float qx, qy;
     float d = DistPointSeg(b.tx, b.ty, ax, ay, bx, by, qx, qy);
 
-    const float slop = 2.0f;
-    float rad = b.r + width * 0.5f + slop;
+    const float slop = 15.0f;
+    float rad = b.r + width * 1.5f + slop;
 
     if (d < rad)
     {

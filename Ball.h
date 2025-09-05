@@ -4,9 +4,9 @@
 
 class Ball : public GameObject {
 public:
-    float vx{ 0 }, vy{ 0 };
-    float r{ 6 };
-    float restitution{ 0.70f };
+	float vx{ 0 }, vy{ 0 }; // velocidad
+	float r{ 6 }; // radio de la bola
+	float restitution{ 0.70f }; // coeficiente de restitución ps el rebote
     Circulo drawer;
 
     void Update(float dt) override { (void)dt; }

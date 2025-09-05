@@ -23,7 +23,7 @@ static void SaveTriangleEdgesPoints(Geometry & g, int X1, int Y1, int X2, int Y2
     saveLine(X3, Y3, X1, Y1);
 }
 
-void Triangulo::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+void Triangulo::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3, Color col)
 {
 
 	// Transformar los puntos del triángulo original
@@ -40,11 +40,11 @@ void Triangulo::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2,
     SaveTriangleEdgesPoints(*this, x1, y1, x2, y2, x3, y3);
 
 	// Rellenar y dibujar contorno
-    FillScanlineY(GREEN);
+    FillScanlineY(col);
     DDATriangle(x1, y1, x2, y2, x3, y3);
 }
 
-void Triangulo::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+void Triangulo::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3, Color col)
 {
 
 	// Transformar los puntos del triángulo original
@@ -61,7 +61,7 @@ void Triangulo::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2,
     SaveTriangleEdgesPoints(*this, x1, y1, x2, y2, x3, y3);
 
 	// Rellenar y dibujar contorno
-    FillScanlineY(YELLOW);
+    FillScanlineY(col);
     BRHTriangle(x1, y1, x2, y2, x3, y3);
 }
 

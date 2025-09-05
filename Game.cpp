@@ -162,7 +162,7 @@ void Game::Update(float dt)
 
 void Game::CollideBorders()
 {
-    if (shooter.ContainsBall(ball)) return; // mientras esté en el canal, sin bordes
+	if (shooter.ContainsBall(ball)) return; // dentro del canal, no colisiona
 
     float leftB = 20.f;
     float rightB = shooter.area.x - 2.f;

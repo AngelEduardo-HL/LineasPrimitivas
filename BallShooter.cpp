@@ -26,7 +26,8 @@ void BallShooter::Draw()
     int Y2 = (int)std::round(pistonY + pistonH);
 
     Geometry::Mat3 I = Geometry::Traslacion(0, 0);
-    drawer.FillBRH(I, X1, Y1, X2, Y2);
+	// relleno del pistón (BRH)
+	drawer.FillBRH(I, X1, Y1, X2, Y2, DARKGRAY);
 }
 
 bool BallShooter::ContainsBall(const Ball& b) const

@@ -25,7 +25,7 @@ public:
     virtual void OnCollision(Ball& b, const CollisionInfo& info) { (void)b; (void)info; }
 
 protected:
-    // M = S(piv) * R(piv) * T
+	// Matriz de transformación combinada
     Geometry::Mat3 BuildM() const {
         auto S = Geometry::EscalaPivote(sx, sy, px, py);
         auto R = Geometry::RotacionPivote(rotDeg, px, py);

@@ -29,3 +29,18 @@ void Target::OnCollision(Ball& b, const CollisionInfo& info)
     b.vx = b.vx - (1.0f + restitution) * vn * info.nx;
     b.vy = b.vy - (1.0f + restitution) * vn * info.ny;
 }
+
+void Target::Draw()
+{
+    Geometry::Mat3 I = Geometry::Traslacion(0, 0);
+
+    if (filled) {
+        // Relleno con TU rasterización Y (color específico del target)
+        drawer.FillBRH(I, (int)(tx + 0.5f), (int)(ty + 0.5f), r, fill);
+    }
+    else {
+        // Solo contorno
+        drawer.DrawBRH(I, (int)(tx + 0.5f), (int)(ty + 0.5f), r);
+    }
+}
+
