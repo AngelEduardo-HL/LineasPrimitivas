@@ -27,9 +27,9 @@ void Flipper::Update(float dt)
 
 void Flipper::Draw()
 {
-    // Relleno de color para dar color al flipper
-    Rectangle rec{ px, py - width * 0.5f, length, width };
-
+	// Relleno de color para dar color al flipper con BRH
+	Cuadrado& drawer = this->drawer; // evitar shadowing
+  
     // Perfil con líneas BRH
     int X1 = (int)(px + 0.5f);
     int Y1 = (int)(py - width * 0.5f + 0.5f);
@@ -38,7 +38,7 @@ void Flipper::Draw()
     drawer.FillBRH(BuildM(), X1, Y1, X2, Y2, color);
 }
 
-void Flipper::Segment(float& ax, float& ay, float& bx, float& by) const
+void Flipper::Segment(float& ax, float& ay, float& bx, float& by) const //
 {
     Geometry::Mat3 M = const_cast<Flipper*>(this)->BuildM();
     int Axi = (int)(px + 0.5f), Ayi = (int)(py + 0.5f);
@@ -77,7 +77,7 @@ void Flipper::OnCollision(Ball& b, const CollisionInfo& info)
     b.tx += info.nx * info.penetration;
     b.ty += info.ny * info.penetration;
 
-    const float restitution = 0.95f;
+	const float restitution = 0.95f; // Rebote grande por ser Flippers
     float vn = b.vx * info.nx + b.vy * info.ny;
     b.vx = b.vx - (1.0f + restitution) * vn * info.nx;
     b.vy = b.vy - (1.0f + restitution) * vn * info.ny;

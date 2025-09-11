@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Cuadrado.h"
 
 class Ball;
 
@@ -8,4 +9,6 @@ public:
     Rectangle area{ 350, 760, 120, 20 };
     bool Check(const Ball& b) const;
     void Draw();
+	Cuadrado drawer;
+	
 };

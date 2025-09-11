@@ -32,15 +32,10 @@ void Target::OnCollision(Ball& b, const CollisionInfo& info)
 
 void Target::Draw()
 {
-    Geometry::Mat3 I = Geometry::Traslacion(0, 0);
-
-    if (filled) {
-        // Relleno con TU rasterización Y (color específico del target)
-        drawer.FillBRH(I, (int)(tx + 0.5f), (int)(ty + 0.5f), r, fill);
-    }
-    else {
-        // Solo contorno
-        drawer.DrawBRH(I, (int)(tx + 0.5f), (int)(ty + 0.5f), r);
-    }
+    //Dibujado y coloreado
+	Geometry::Mat3 I = Geometry::Traslacion(0, 0);
+	Target::drawer.DrawBRH(I, (int)(tx + 0.5f), (int)(ty + 0.5f), r);// Contorno del Circulo con BRH
+	if (filled) Target::drawer.FillBRH(I, (int)(tx + 0.5f), (int)(ty + 0.5f), r, fill); // Circulo relleno
+    
 }
 

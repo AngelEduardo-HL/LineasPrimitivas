@@ -9,9 +9,10 @@ public:
     int   score{ 0 };          // rojo=100, amarillo=50, verde=25 bumpers=0
 	Color ring{ RAYWHITE };    // color del aro
     bool  filled{ false };
-    Color fill{ WHITE };       // color de relleno si filled=true
+	// si se rellena
+	Color fill{ WHITE };         // color del relleno
 
-    Circulo drawer;
+    Circulo drawer; // Dibujado y relleno
 
     void Draw() override;
 

@@ -13,7 +13,7 @@ public:
     float speed{ 600.f };
     bool  pressed{ false };
 
-    Color color{ BLUE };      // color visual
+    Color color{ DARKBLUE };      // color visual
     Cuadrado drawer;
 
     void Update(float dt) override;

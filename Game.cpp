@@ -30,6 +30,7 @@ bool ShooterGuide::CollideAndBounce(Ball& b) const
     float d = std::sqrtf(dx * dx + dy * dy);
     float rad = b.r + thick * 0.5f;
 
+
     if (d < rad) {
         float nx = (d > 1e-6f) ? dx / d : 0.f;
         float ny = (d > 1e-6f) ? dy / d : -1.f;
@@ -51,40 +52,46 @@ Game::Game(int w, int h) : W(w), H(h)
     shooter.area = { (float)(W - 40), 120.f, 20.f, 600.f };
 
     // Bola: más alta en el canal
-    ball.r = 6.f;
+    ball.r = 5.0f;
     ball.tx = shooter.area.x + shooter.area.width * 0.5f;
     const float spawnMarginTop = 90.f;
     ball.ty = shooter.area.y + spawnMarginTop + ball.r;
     ball.vx = 0.f; ball.vy = 0.f;
 
-    // Flippers "como antes": reposo ARRIBA, bajan con tecla
-    left.px = 250.f; left.py = 690.f; left.length = 150.f; left.width = 20.f;
-    left.restAngle = -25.f; left.hitAngle = 30.f; left.rotDeg = left.restAngle; left.color = Color{ 40,140,255,255 };
+	// Flippers izquierdo y derecho
+	left.px = 175.f; left.py = 690.f; left.length = 120.f; left.width = 20.f;// pivote en extremo derecho
+    left.restAngle = 30.f; left.hitAngle = -25.f; left.rotDeg = left.restAngle; left.color = DARKBLUE;
 
-    right.px = 550.f; right.py = 690.f; right.length = -150.f; right.width = 20.f;
-    right.restAngle = 25.f; right.hitAngle = -30.f; right.rotDeg = right.restAngle; right.color = Color{ 40,140,255,255 };
+    right.px = 420.f; right.py = 690.f; right.length = -120.f; right.width = 20.f;
+    right.restAngle = -30.f; right.hitAngle = 25.f; right.rotDeg = right.restAngle; right.color = DARKBLUE;
 
     // Targets superiores con relleno
     targets.clear();
-    { Target t; t.tx = 400; t.ty = 210; t.r = 22; t.restitution = 1.10f; t.score = 100; t.ring = WHITE; t.filled = true; t.fill = RED;    targets.push_back(t); }
-    { Target t; t.tx = 310; t.ty = 270; t.r = 22; t.restitution = 1.05f; t.score = 50; t.ring = WHITE; t.filled = true; t.fill = YELLOW; targets.push_back(t); }
-    { Target t; t.tx = 490; t.ty = 270; t.r = 22; t.restitution = 1.05f; t.score = 25; t.ring = WHITE; t.filled = true; t.fill = GREEN;  targets.push_back(t); }
+    { Target t; t.tx = 300; t.ty = 195; t.r = 6; t.restitution = 1.10f; t.score = 100; t.ring = WHITE; t.filled = true; t.fill = RED;    targets.push_back(t); }
+    { Target t; t.tx = 225; t.ty = 260; t.r = 6; t.restitution = 1.05f; t.score = 50; t.ring = WHITE; t.filled = true; t.fill = YELLOW; targets.push_back(t); }
+    { Target t; t.tx = 375; t.ty = 260; t.r = 6; t.restitution = 1.05f; t.score = 25; t.ring = WHITE; t.filled = true; t.fill = GREEN;  targets.push_back(t); }
 
     // Bumpers grises pequeños
     auto addBumper = [&](float x, float y, float r) {
-        Target t; t.tx = x; t.ty = y; t.r = r; t.restitution = 1.25f; t.score = 0; t.ring = GRAY; t.filled = false; targets.push_back(t);
+		// BUMPER gris
+        Target t; t.tx = x; t.ty = y; t.r = r; t.restitution = 1.25f; t.score = 0; t.ring = GRAY; t.filled = true; targets.push_back(t);
         };
-    addBumper(150, 180, 14);
-    addBumper(650, 180, 14);
-    addBumper(400, 360, 14);
-    addBumper(245, 540, 12);
-    addBumper(555, 540, 12);
-    addBumper(650, 320, 12);
-    addBumper(150, 320, 12);
+    addBumper(150, 130, 4);
+    addBumper(300, 65, 4);
+    addBumper(450, 130, 4);
+
+    addBumper(300, 325, 4);
+    addBumper(185, 390, 4);
+    addBumper(400, 390, 4);
+
+    addBumper(300, 520, 4);
+	addBumper(525, 585, 4);
+	addBumper(75, 585, 4);
+
 
     // Triángulos (solo contorno BRH)
     tris.clear();
-    tris.push_back({ 320,500,  360,420,  380,520, 0.75f });
+	tris.push_back({ 320,500,  360,420,  380,520, 0.75f });// coords (x1,y1, x2,y2, x3,y3, Rebote)
     tris.push_back({ 480,500,  420,420,  400,520, 0.75f });
     tris.push_back({ 190,640,  260,600,  220,700, 0.75f });
     tris.push_back({ 610,640,  540,600,  580,700, 0.75f });
@@ -93,6 +100,7 @@ Game::Game(int w, int h) : W(w), H(h)
     out.area = { (float)(W / 2 - 60), (float)(H - 22), 120.f, 20.f };
 
     // Guía inclinada para salir del shooter
+	// coordenadas del segmento
     guide.ax = shooter.area.x - 6.f;
     guide.ay = shooter.area.y + 32.f;
     guide.bx = shooter.area.x - 54.f;
@@ -131,7 +139,7 @@ void Game::Update(float dt)
     ball.tx += ball.vx * dt;
     ball.ty += ball.vy * dt;
 
-    // shooter otra vez (por si avanza dentro)
+    // shooter
     shooter.ApplyToBall(ball);
 
     // guía inclinada
@@ -165,9 +173,9 @@ void Game::CollideBorders()
 	if (shooter.ContainsBall(ball)) return; // dentro del canal, no colisiona
 
     float leftB = 20.f;
-    float rightB = shooter.area.x - 2.f;
+    float rightB = shooter.area.x - 2.f; 
     float topB = 20.f;
-    float botB = (float)H - 22.f;
+    float botB = (float)H - 22.f; 
 
     if (ball.tx - ball.r < leftB) { ball.tx = leftB + ball.r; ball.vx = std::abs(ball.vx); }
     if (ball.tx + ball.r > rightB) { ball.tx = rightB - ball.r; ball.vx = -std::abs(ball.vx); }
@@ -225,7 +233,7 @@ void Game::Draw()
 {
     ClearBackground(Color{ 120,60,140,255 });
 
-    // Bordes del campo (sin canal del shooter)
+	// Bordes del campo y canal del shooter
     DrawLine(20, 20, (int)shooter.area.x - 2, 20, BLACK);
     DrawLine(20, 20, 20, H - 22, BLACK);
     DrawLine((int)shooter.area.x - 2, 20, (int)shooter.area.x - 2, H - 22, BLACK);
