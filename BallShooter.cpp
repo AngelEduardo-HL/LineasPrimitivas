@@ -41,7 +41,7 @@ bool BallShooter::ContainsBall(const Ball& b) const
 
 void BallShooter::ApplyToBall(Ball& b)
 {
-    if (!ContainsBall(b)) return;
+    if (!ContainsBall(b)) return; 
 
     float cx = area.x + area.width * 0.5f;
     b.tx = cx;
@@ -50,7 +50,7 @@ void BallShooter::ApplyToBall(Ball& b)
     float pistonY = area.y + comp * (area.height - pistonH);
     float topFaceY = pistonY;
 
-    // clamp: bola por encima del pistón y dentro del canal
+    // bola por encima del pistón y dentro del canal
     float minBallY = std::max(area.y + b.r, topFaceY - b.r);
     if (b.ty > minBallY) {
         b.ty = minBallY;
