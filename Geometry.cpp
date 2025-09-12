@@ -184,10 +184,13 @@ void Geometry::FillScanlineY(Color col)
         if (pts[i].y > ymax) ymax = pts[i].y;
     }
 
+	// Inset para evitar gaps con la colision
+    const int inset = 1;
+
     for (int y = ymin; y <= ymax; ++y)
     {
         std::vector<int> xs;
-        xs.reserve(64);
+		xs.reserve(64);// evitar realocaciones
 
         for (const auto& p : pts)
             if (p.y == y) xs.push_back(p.x);
@@ -195,16 +198,28 @@ void Geometry::FillScanlineY(Color col)
         if (xs.empty()) continue;
 
         std::sort(xs.begin(), xs.end());
-        if ((xs.size() % 2) != 0) xs.push_back(xs.back());
+
+        // Quitar duplicados
+        xs.erase(std::unique(xs.begin(), xs.end()), xs.end());
+
+        // Si quedó impar, recorta el último
+        if ((xs.size() % 2) != 0) xs.pop_back();
 
         for (size_t k = 0; k + 1 < xs.size(); k += 2)
         {
             int x0 = xs[k], x1 = xs[k + 1];
             if (x1 < x0) std::swap(x0, x1);
-            DrawLine(x0, y, x1, y, col);
+
+            // Encoge hacia adentro para casar mejor con la colisión
+            x0 += inset;
+            x1 -= inset;
+
+            if (x1 >= x0)
+                BRHLine(x0, y, x1, y, col);
         }
     }
 }
+
 
 // ---------------- Relleno especifico para circulo ----------------
 void Geometry::CircleScanlineY(int cx, int cy, int r, Color col)

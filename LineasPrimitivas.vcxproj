@@ -140,6 +140,7 @@
     <ClCompile Include="OutHole.cpp" />
     <ClCompile Include="Target.cpp" />
     <ClCompile Include="Triangulo.cpp" />
+    <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="OutHole.h" />
     <ClInclude Include="Target.h" />
     <ClInclude Include="Triangulo.h" />
+    <ClInclude Include="Wall.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

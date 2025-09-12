@@ -85,18 +85,18 @@ Game::Game(int w, int h) : W(w), H(h)
     addBumper(400, 390, 4);
 
     addBumper(300, 520, 4);
-	addBumper(525, 585, 4);
+	addBumper(490, 585, 4);
 	addBumper(75, 585, 4);
 
 
     // Triángulos (solo contorno BRH)
     tris.clear();
-	tris.push_back({ 320,500,  360,420,  380,520, 0.75f });// coords (x1,y1, x2,y2, x3,y3, Rebote)
+	tris.push_back({ 150,520,  225,550,  150,455, 0.75f });// coords (x1,y1, x2,y2, x3,y3, Rebote)
     tris.push_back({ 480,500,  420,420,  400,520, 0.75f });
-    tris.push_back({ 190,640,  260,600,  220,700, 0.75f });
-    tris.push_back({ 610,640,  540,600,  580,700, 0.75f });
+   // tris.push_back({ 190,640,  260,600,  220,700, 0.75f });
+   // tris.push_back({ 610,640,  540,600,  580,700, 0.75f });
 
-    // OutHole (abajo centrado)
+    // OutHole
     out.area = { (float)(W / 2 - 60), (float)(H - 22), 120.f, 20.f };
 
     // Guía inclinada para salir del shooter
@@ -107,6 +107,47 @@ Game::Game(int w, int h) : W(w), H(h)
     guide.by = shooter.area.y + 84.f;
     guide.thick = 14.f;
     guide.restitution = 0.95f;
+
+	// Bordes del campo
+	walls.clear();
+    // === Embudo hacia el OutHole ===
+    // izquierda
+    walls.push_back(Wall::FromAB(
+		10.f, 680.f, //(X, Y) punto A
+		out.area.x - 8.f, out.area.y + 20.f, //(X, Y) punto B
+        14.f, BLACK, 0.98f));
+
+    // Derecha borde superiror 
+    walls.push_back(Wall::FromAB(
+        550, 680.f,
+        out.area.x + out.area.width + 8.f, out.area.y + 20.f,
+        14.f, BLACK, 0.98f));
+
+    // === Forma de reloj ===
+    walls.push_back(Wall::FromAB(
+		20.f, 170.f,
+		130.f, 320.f,
+        12.f, BLACK, 0.98f));
+    walls.push_back(Wall::FromAB(
+        130.f, 320.f,
+        20.f, 455.f,
+        12.f, BLACK, 0.98f));
+    walls.push_back(Wall::FromAB(
+        shooter.area.x - 20.f, 170.f,
+        shooter.area.x - 130.f, 320.f,
+        12.f, BLACK, 0.98f));
+    walls.push_back(Wall::FromAB(
+        shooter.area.x - 130.f, 320.f,
+        shooter.area.x - 20.f, 455.f,
+        12.f, BLACK, 0.98f));
+
+	//=== Bordes de la Pantalla ===
+	walls.push_back(Wall::FromAB(20.f, 20.f, 20.f, (float)(H - 22), 14.f, BLACK, 0.98f)); // izquierda
+	walls.push_back(Wall::FromAB(20.f, 20.f, (float)(shooter.area.x - 2), 20.f, 14.f, BLACK, 0.98f)); // arriba
+	walls.push_back(Wall::FromAB((float)(shooter.area.x - 2), 200.f, (float)(shooter.area.x - 2), (float)(H - 22), 14.f, BLACK, 0.98f)); // derecha del canal
+
+    // barrita superior
+	tr = Triangulo();
 }
 
 void Game::HandleInput()
@@ -141,6 +182,10 @@ void Game::Update(float dt)
 
     // shooter
     shooter.ApplyToBall(ball);
+
+	for (auto& w : walls) {
+		w.CollideAndBounce(ball);
+	}
 
     // guía inclinada
     guide.CollideAndBounce(ball);
@@ -234,9 +279,12 @@ void Game::Draw()
     ClearBackground(Color{ 120,60,140,255 });
 
 	// Bordes del campo y canal del shooter
-    DrawLine(20, 20, (int)shooter.area.x - 2, 20, BLACK);
-    DrawLine(20, 20, 20, H - 22, BLACK);
-    DrawLine((int)shooter.area.x - 2, 20, (int)shooter.area.x - 2, H - 22, BLACK);
+    Geometry g;
+    g.BRHLine(20, 20, (int)shooter.area.x - 2, 20, BLACK);
+    g.BRHLine(20, 20, 20, H - 22, BLACK);
+    g.BRHLine((int)shooter.area.x - 2, 20, (int)shooter.area.x - 2, H - 22, BLACK);
+
+	for (auto& w : walls) w.Draw();
 
     // Shooter y guía
     shooter.Draw();

@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "raylib.h"
 #include <vector>
 #include <algorithm>
@@ -33,8 +32,8 @@ public:
     static Mat3 EscalaPivote(float sx, float sy, float cx, float cy);
 
     // ---- Dibujo de lineas base ----
-    void DDALine(int X1, int Y1, int X2, int Y2, Color col = GREEN);
-    void BRHLine(int X1, int Y1, int X2, int Y2, Color col = YELLOW);
+    void DDALine(int X1, int Y1, int X2, int Y2, Color col = BLACK);
+    void BRHLine(int X1, int Y1, int X2, int Y2, Color col = BLACK);
 
     // ---- Rasterizacion generica por eje Y ----
     void FillScanlineY(Color col);

@@ -7,6 +7,7 @@
 #include "OutHole.h"
 #include "Triangulo.h"
 #include "Cuadrado.h"
+#include "Wall.h"
 
 // Guía inclinada a la salida del shooter
 struct ShooterGuide {
@@ -15,14 +16,14 @@ struct ShooterGuide {
     float restitution{ 0.95f };
     Cuadrado drawer;
 
-    void Draw(){
+    void Draw() {
         // Longitud y ángulo del segmento
         float L = sqrtf((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
         float angDeg = atan2f(by - ay, bx - ax) * 180.0f / PI;
-		// Matriz de rotación
+        // Matriz de rotación
         Geometry::Mat3 R = Geometry::RotacionPivote(angDeg, (int)ax, (int)ay);
-		// Relleno del rectángulo (BRH)
-        drawer.FillBRH(R,(int)ax, (int)(ay - thick * 0.5f),(int)(ax + L), (int)(ay + thick * 0.5f),GRAY);
+        // Relleno del rectángulo (BRH)
+        drawer.FillBRH(R, (int)ax, (int)(ay - thick * 0.5f), (int)(ax + L), (int)(ay + thick * 0.5f), GRAY);
     }
 
     bool CollideAndBounce(class Ball& b) const;
@@ -53,6 +54,7 @@ private:
     Flipper left, right;
     std::vector<Target> targets;   // incluye bumpers grises
     std::vector<TriDeflector> tris;
+	std::vector<Wall> walls; // bordes del campo
 
     BallShooter shooter;
     ShooterGuide guide;

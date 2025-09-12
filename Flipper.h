@@ -4,8 +4,8 @@
 
 class Flipper : public GameObject {
 public:
-    float length{ 150.f };
-    float width{ 20.f };
+	float length{ 150.f }; // dimensiones del flipper
+	float width{ 20.f };  // dimensiones del flipper
 
 	// ángulos y velocidad
 	float restAngle{ -25.f };   // ángulo de reposo
