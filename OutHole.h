@@ -6,9 +6,17 @@ class Ball;
 
 class OutHole : public GameObject {
 public:
-    Rectangle area{ 350, 760, 120, 20 };
+    int x{ 350 }, y{ 760 }, w{ 120 }, h{ 20 };
+
     bool Check(const Ball& b) const;
+
     void Draw();
-	Cuadrado drawer;
-	
+
+    inline int Left()   const { return x; }
+    inline int Right()  const { return x + w; }
+    inline int Top()    const { return y; }
+    inline int Bottom() const { return y + h; }
+
+private:
+    Cuadrado drawer;
 };

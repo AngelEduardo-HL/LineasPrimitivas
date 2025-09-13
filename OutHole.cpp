@@ -1,16 +1,21 @@
 #include "OutHole.h"
 #include "Ball.h"
-#include "raylib.h"
 
 bool OutHole::Check(const Ball& b) const
 {
-    return (b.tx >= area.x && b.tx <= area.x + area.width &&
-        b.ty >= area.y && b.ty <= area.y + area.height);
+    return (b.tx >= x && b.tx <= x + w &&
+        b.ty >= y && b.ty <= y + h);
 }
 
 void OutHole::Draw()
 {
-	// Dibujar el rectángulo del OutHole
-	Geometry::Mat3 I = Geometry::Traslacion(0, 0);
-	drawer.FillBRH(I, (int)area.x, (int)area.y, (int)(area.x + area.width), (int)(area.y + area.height), RED);
+    Geometry::Mat3 I = Geometry::Traslacion(0, 0);
+
+    const int x1 = x;
+    const int y1 = y;
+    const int x2 = x + w;
+    const int y2 = y + h;
+
+    drawer.FillBRH(I, x1, y1, x2, y2, RED);
+    drawer.DrawBRH(I, x1, y1, x2, y2);
 }

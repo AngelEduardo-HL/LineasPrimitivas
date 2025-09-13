@@ -11,7 +11,7 @@ struct Rect {
 
 class BallShooter : public GameObject {
 public:
-    // Canal del resorte (alineado al eje Y, como antes)
+    // Canal del resorte
     Rect area{ 760, 120, 20, 600 };
 
     // Compresión/animación del pistón

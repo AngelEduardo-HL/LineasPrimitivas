@@ -101,7 +101,10 @@ Game::Game(int w, int h) : W(w), H(h)
     tris.push_back({ 475,532,  400,562,  475,466,  1.2f });
 
     // OutHole
-    out.area = { (float)(W / 2 - 60), (float)(H - 22), 120.f, 20.f };
+    out.x = W / 2 - 60;
+    out.y = H - 22;
+    out.w = 120;
+    out.h = 20;
 
     // Guía inclinada para salir del shooter
 	// coordenadas del segmento
@@ -117,14 +120,14 @@ Game::Game(int w, int h) : W(w), H(h)
     // === Embudo hacia el OutHole ===
     // izquierda
     walls.push_back(Wall::FromAB(
-		10.f, 680.f, //(X, Y) punto A
-		out.area.x - 8.f, out.area.y + 20.f, //(X, Y) punto B
+        10.f, 680.f,
+        (float)out.Left() - 8.f, (float)out.Bottom(),
         14.f, BLACK, 0.98f));
 
-    // Derecha borde superiror 
+	// derecha
     walls.push_back(Wall::FromAB(
-        550, 680.f,
-        out.area.x + out.area.width + 8.f, out.area.y + 20.f,
+        550.f, 680.f,
+        (float)out.Right() + 8.f, (float)out.Bottom(),
         14.f, BLACK, 0.98f));
 
     // === Forma de reloj ===
@@ -256,7 +259,7 @@ void Game::CollideBorders()
     if (ball.tx + ball.r > rightB) { ball.tx = rightB - ball.r; ball.vx = -std::abs(ball.vx); }
     if (ball.ty - ball.r < topB) { ball.ty = topB + ball.r; ball.vy = std::abs(ball.vy); }
     if (ball.ty + ball.r > botB) {
-        if (ball.tx < out.area.x || ball.tx > out.area.x + out.area.width) {
+        if (ball.tx < out.Left() || ball.tx > out.Right()) {
             ball.ty = botB - ball.r;
             ball.vy = -std::abs(ball.vy) * 0.85f;
         }
@@ -359,8 +362,9 @@ void Game::Draw()
     // Mensajes de estado
     if (state != GameState::PLAYING)
     {
-        // Oscurecer un poco el fondo
-        DrawRectangle(0, 0, W, H, Color{ 0,0,0,120 });
+        Cuadrado q;
+		Geometry::Mat3 I = Geometry::Traslacion(0, 0);
+		q.FillBRH(I, 0, H / 2 - 60, W, H / 2 + 60, Color{ 0,0,0,180 });
 
         const char* mainText = (state == GameState::WON) ? "GANASTE!!" : "¡PERDISTE!!";
         const char* subText = "Pulsa ENTER para nueva partida";
