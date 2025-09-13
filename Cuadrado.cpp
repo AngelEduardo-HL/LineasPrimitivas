@@ -17,7 +17,7 @@ static void SaveLineDDA(Geometry& g, int X1, int Y1, int X2, int Y2)
     }
 }
 
-void Cuadrado::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
+void Cuadrado::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, Color col)
 {
     //Evita que el relleno desaparezca con la rotacion
 	if (X1 == X2 || Y1 == Y2) return; // Evita relleno de lineas
@@ -37,14 +37,14 @@ void Cuadrado::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
     SaveLineDDA(*this, dx, dy, ax, ay);
 
     //Rellenar y dibujar contorno
-    FillScanlineY(GREEN);
+    FillScanlineY(col);
     DDALine(ax, ay, bx, by);
     DDALine(bx, by, cx, cy);
     DDALine(cx, cy, dx, dy);
     DDALine(dx, dy, ax, ay);
 }
 
-void Cuadrado::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
+void Cuadrado::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, Color col)
 {
 	// Evita que el relleno desaparezca con la rotacion
 	if (X1 == X2 || Y1 == Y2) return; // Evita relleno de lineas
@@ -64,7 +64,7 @@ void Cuadrado::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2)
     SaveLineDDA(*this, dx, dy, ax, ay);
 
 	// Rellenar y dibujar contorno
-    FillScanlineY(YELLOW);
+    FillScanlineY(col);
     BRHLine(ax, ay, bx, by);
     BRHLine(bx, by, cx, cy);
     BRHLine(cx, cy, dx, dy);

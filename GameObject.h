@@ -1,11 +1,10 @@
 #pragma once
-#include "raylib.h"
 #include "Geometry.h"
 
 struct CollisionInfo {
-    float nx{ 0 }, ny{ 0 };
-    float penetration{ 0 };
-    float cx{ 0 }, cy{ 0 };
+	float nx{ 0 }, ny{ 0 };// normal unitario de colisión
+	float penetration{ 0 };// profundidad de penetración
+	float cx{ 0 }, cy{ 0 };// punto de contacto
 };
 
 class Ball; // fwd
@@ -25,6 +24,7 @@ public:
     virtual void OnCollision(Ball& b, const CollisionInfo& info) { (void)b; (void)info; }
 
 protected:
+	// Matriz de transformación combinada
     Geometry::Mat3 BuildM() const {
         auto S = Geometry::EscalaPivote(sx, sy, px, py);
         auto R = Geometry::RotacionPivote(rotDeg, px, py);

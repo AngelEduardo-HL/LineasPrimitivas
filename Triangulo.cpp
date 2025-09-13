@@ -23,45 +23,58 @@ static void SaveTriangleEdgesPoints(Geometry & g, int X1, int Y1, int X2, int Y2
     saveLine(X3, Y3, X1, Y1);
 }
 
-void Triangulo::FillDDA(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+void Triangulo::FillDDA(const Geometry::Mat3& M,
+    int X1, int Y1, int X2, int Y2, int X3, int Y3,
+    Color col)
 {
-
 	// Transformar los puntos del triángulo original
     int x1, y1, x2, y2, x3, y3;
     TransformPoint(M, X1, Y1, x1, y1);
     TransformPoint(M, X2, Y2, x2, y2);
     TransformPoint(M, X3, Y3, x3, y3);
 
-    // Evita que el relleno desaparezca con la rotacion
-    if (x1 == x2 || y1 == y2 || x3 == y3 || y1 == y2 || y2 == y3 || x2 == y3) return; // Evita relleno de lineas
+	// Evita que el relleno desaparezca con la rotacion
+    int area2 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+    if (area2 == 0) {
+		// Es una línea, dibujar solo el contorno
+        DDATriangle(x1, y1, x2, y2, x3, y3);
+        return;
+    }
 
 	// Guardar los bordes del triángulo transformado
     ClearPoints();
     SaveTriangleEdgesPoints(*this, x1, y1, x2, y2, x3, y3);
 
 	// Rellenar y dibujar contorno
-    FillScanlineY(GREEN);
+    FillScanlineY(col);
     DDATriangle(x1, y1, x2, y2, x3, y3);
 }
 
-void Triangulo::FillBRH(const Geometry::Mat3& M, int X1, int Y1, int X2, int Y2, int X3, int Y3)
+
+void Triangulo::FillBRH(const Geometry::Mat3& M,
+    int X1, int Y1, int X2, int Y2, int X3, int Y3,
+    Color col)
 {
-
 	// Transformar los puntos del triángulo original
-	int x1, y1, x2, y2, x3, y3;
-	TransformPoint(M, X1, Y1, x1, y1);
-	TransformPoint(M, X2, Y2, x2, y2);
-	TransformPoint(M, X3, Y3, x3, y3);
+    int x1, y1, x2, y2, x3, y3;
+    TransformPoint(M, X1, Y1, x1, y1);
+    TransformPoint(M, X2, Y2, x2, y2);
+    TransformPoint(M, X3, Y3, x3, y3);
 
-    // Evita que el relleno desaparezca con la rotacion
-    if (x1 == x2 || y1 == y2 || x3 == y3 || y1 == y2 || y2 == y3 || x2 == y3) return; // Evita relleno de lineas
+	// Evita que el relleno desaparezca con la rotacion
+    int area2 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+    if (area2 == 0) {
+		// Es una línea, dibujar solo el contorno
+        BRHTriangle(x1, y1, x2, y2, x3, y3);
+        return;
+    }
 
 	// Guardar los bordes del triángulo transformado
     ClearPoints();
     SaveTriangleEdgesPoints(*this, x1, y1, x2, y2, x3, y3);
 
 	// Rellenar y dibujar contorno
-    FillScanlineY(YELLOW);
+    FillScanlineY(col);
     BRHTriangle(x1, y1, x2, y2, x3, y3);
 }
 

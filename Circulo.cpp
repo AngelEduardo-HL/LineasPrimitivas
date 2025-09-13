@@ -29,7 +29,7 @@ static void SaveCirclePerimeterPoints(Geometry& g, int cx, int cy, float radio)
 }
 
 
-void Circulo::FillDDA(const Geometry::Mat3& M, int cx, int cy, float r)
+void Circulo::FillDDA(const Geometry::Mat3& M, int cx, int cy, float r, Color col)
 {
     //Escalamiento del rado
 	r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
@@ -44,10 +44,10 @@ void Circulo::FillDDA(const Geometry::Mat3& M, int cx, int cy, float r)
 	TransformPoint(M, cx, cy, x, y);
     SaveCirclePerimeterPoints(*this, x, y, r);
     DDACircle((float)x, (float)y, r);
-    CircleScanlineY(x, y, (int)(r + 0.5f), GREEN);
+    CircleScanlineY(x, y, (int)(r + 0.5f), col);
 }
 
-void Circulo::FillBRH(const Geometry::Mat3& M, int cx, int cy, float r)
+void Circulo::FillBRH(const Geometry::Mat3& M, int cx, int cy, float r, Color col)
 {
     //Escalamiento del rado
     r *= (M.m[0][0] + M.m[1][1]); // Escala hacia adentro
@@ -62,7 +62,7 @@ void Circulo::FillBRH(const Geometry::Mat3& M, int cx, int cy, float r)
 	TransformPoint(M, cx, cy, x, y);
     SaveCirclePerimeterPoints(*this, x, y, r);
     BRHCircle(x, y, r);
-    CircleScanlineY(x, y, (int)(r + 0.5f), YELLOW);
+    CircleScanlineY(x, y, (int)(r + 0.5f), col);
 }
 
 void Circulo::DrawDDA(const Geometry::Mat3& M, int cx, int cy, float r)

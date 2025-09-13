@@ -178,30 +178,33 @@ void Geometry::FillScanlineY(Color col)
     if (pts.empty()) return;
 
     int ymin = pts[0].y, ymax = pts[0].y;
-    for (size_t i = 1; i < pts.size(); ++i)
-    {
+    for (size_t i = 1; i < pts.size(); ++i) {
         if (pts[i].y < ymin) ymin = pts[i].y;
         if (pts[i].y > ymax) ymax = pts[i].y;
     }
 
-    for (int y = ymin; y <= ymax; ++y)
-    {
-        std::vector<int> xs;
-        xs.reserve(64);
+    int H = ymax - ymin + 1;
+    if (H <= 0) return;
 
-        for (const auto& p : pts)
-            if (p.y == y) xs.push_back(p.x);
+	std::vector<int> minX(H, 1000000000); // valor grande
+	std::vector<int> maxX(H, -1000000000); // valor pequeño
 
-        if (xs.empty()) continue;
+    for (const auto& p : pts) {
+        int idx = p.y - ymin;
+        if (idx < 0 || idx >= H) continue;
+        if (p.x < minX[idx]) minX[idx] = p.x;
+        if (p.x > maxX[idx]) maxX[idx] = p.x;
+    }
 
-        std::sort(xs.begin(), xs.end());
-        if ((xs.size() % 2) != 0) xs.push_back(xs.back());
+    const int inset = 1;
 
-        for (size_t k = 0; k + 1 < xs.size(); k += 2)
-        {
-            int x0 = xs[k], x1 = xs[k + 1];
-            if (x1 < x0) std::swap(x0, x1);
-            DrawLine(x0, y, x1, y, col);
+    for (int y = ymin; y <= ymax; ++y) {
+        int idx = y - ymin;
+        int x0 = minX[idx], x1 = maxX[idx];
+        if (x0 <= x1) {
+            x0 += inset;
+            x1 -= inset;
+            if (x0 <= x1) DrawLine(x0, y, x1, y, col);
         }
     }
 }

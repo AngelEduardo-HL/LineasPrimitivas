@@ -10,5 +10,7 @@ bool OutHole::Check(const Ball& b) const
 
 void OutHole::Draw()
 {
-    DrawRectangle((int)area.x, (int)area.y, (int)area.width, (int)area.height, RED);
+	// Dibujar el rectángulo del OutHole
+	Geometry::Mat3 I = Geometry::Traslacion(0, 0);
+	drawer.FillBRH(I, (int)area.x, (int)area.y, (int)(area.x + area.width), (int)(area.y + area.height), RED);
 }

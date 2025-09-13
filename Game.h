@@ -7,6 +7,7 @@
 #include "OutHole.h"
 #include "Triangulo.h"
 #include "Cuadrado.h"
+#include "Wall.h"
 
 // Guía inclinada a la salida del shooter
 struct ShooterGuide {
@@ -15,13 +16,14 @@ struct ShooterGuide {
     float restitution{ 0.95f };
     Cuadrado drawer;
 
-    void Draw(){
+    void Draw() {
+        // Longitud y ángulo del segmento
         float L = sqrtf((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
         float angDeg = atan2f(by - ay, bx - ax) * 180.0f / PI;
+        // Matriz de rotación
         Geometry::Mat3 R = Geometry::RotacionPivote(angDeg, (int)ax, (int)ay);
-        drawer.FillBRH(R,
-            (int)ax, (int)(ay - thick * 0.5f),
-            (int)(ax + L), (int)(ay + thick * 0.5f));
+        // Relleno del rectángulo (BRH)
+        drawer.FillBRH(R, (int)ax, (int)(ay - thick * 0.5f), (int)(ax + L), (int)(ay + thick * 0.5f), GRAY);
     }
 
     bool CollideAndBounce(class Ball& b) const;
@@ -33,8 +35,11 @@ struct TriDeflector {
     void Draw(Triangulo& tr) const {
         Geometry::Mat3 I = Geometry::Traslacion(0, 0);
         tr.DrawBRH(I, x1, y1, x2, y2, x3, y3);
+		tr.FillBRH(I, x1, y1, x2, y2, x3, y3, GREEN);
     }
 };
+
+enum class GameState { PLAYING, WON, LOST };
 
 class Game {
 public:
@@ -51,6 +56,7 @@ private:
     Flipper left, right;
     std::vector<Target> targets;   // incluye bumpers grises
     std::vector<TriDeflector> tris;
+	std::vector<Wall> walls; // bordes del campo
 
     BallShooter shooter;
     ShooterGuide guide;
@@ -63,8 +69,14 @@ private:
     int score = 0;
     int lives = 3;
 
+    GameState state = GameState::PLAYING;
+    int winScore = 250;
+
     void CollideBorders();
     void CollideFlippers();
     void CollideTargets();
     void CollideTriangles();
+
+    // NUEVO: helper para colocar la bola en el canal del shooter
+    void ResetBallInShooter();
 };
