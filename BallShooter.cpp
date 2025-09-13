@@ -2,7 +2,7 @@
 #include "Ball.h"
 #include <cmath>
 
-// Actualiza compresión del pistón (SPACE)
+// compresión del pistón (SPACE)
 void BallShooter::Update(float dt)
 {
     prevComp = comp;
@@ -13,7 +13,7 @@ void BallShooter::Update(float dt)
         comp += compRate * dt;
         if (comp > 1.f) comp = 1.f;
     }
-    // Soltar: inicia descompresión
+    // Soltar
     if (IsKeyReleased(KEY_SPACE)) releasing = true;
 
     // Descomprimir hasta 0
@@ -44,13 +44,13 @@ void BallShooter::Draw()
     int X2 = (int)std::lround(area.x + area.width - 1);
     int Y2 = (int)std::lround(pistonY + pistonH);
 
-    // Relleno del pistón con tu rasterización Y
+    // Relleno del pistón
     drawer.FillBRH(I, X1, Y1, X2, Y2, DARKGRAY);
 }
 
 bool BallShooter::ContainsBall(const Ball& b) const
 {
-    // AABB del canal, contraído por el radio de la bola en X
+    // AABB del canal
     float left = area.x + b.r;
     float right = area.x + area.width - b.r;
     float top = area.y;
@@ -66,7 +66,7 @@ void BallShooter::ApplyToBall(Ball& b)
     float cx = area.x + area.width * 0.5f;
     b.tx = cx;
 
-    // Cara superior del pistón (colisión vertical)
+	// Colision con el pistón
     const float pistonH = 80.0f;
     float pistonY = area.y + comp * (area.height - pistonH);
     float topFaceY = pistonY;
@@ -78,7 +78,7 @@ void BallShooter::ApplyToBall(Ball& b)
         if (b.vy > 0.0f) b.vy = 0.0f;
     }
 
-    // Impulso durante descompresión (delta de compresión -> velocidad)
+    // Impulso durante descompresión
     if (releasing && prevComp > comp) {
         float dComp = (prevComp - comp);
         float boost = maxSpeed * dComp;

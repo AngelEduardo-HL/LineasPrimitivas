@@ -9,6 +9,8 @@
 #include "Cuadrado.h"
 #include "Wall.h"
 
+enum class DrawMode { DDA, BRH };
+
 // Guía inclinada a la salida del shooter
 struct ShooterGuide {
     float ax{ 0 }, ay{ 0 }, bx{ 0 }, by{ 0 };
@@ -48,6 +50,7 @@ public:
     void HandleInput();
     void Update(float dt);
     void Draw();
+
 
 private:
     int W, H;
