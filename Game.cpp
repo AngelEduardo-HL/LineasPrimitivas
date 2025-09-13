@@ -59,54 +59,58 @@ Game::Game(int w, int h) : W(w), H(h)
     ball.vx = 0.f; ball.vy = 0.f;
 
 	// Flippers izquierdo y derecho
-	left.px = 175.f; left.py = 690.f; left.length = 120.f; left.width = 20.f;// pivote en extremo derecho
+	left.px = 175.f; left.py = 670.f; left.length = 120.f; left.width = 20.f;// pivote en extremo derecho
     left.restAngle = 30.f; left.hitAngle = -25.f; left.rotDeg = left.restAngle; left.color = DARKBLUE;
 
-    right.px = 420.f; right.py = 690.f; right.length = -120.f; right.width = 20.f;
+    right.px = 420.f; right.py = 670.f; right.length = -120.f; right.width = 20.f;
     right.restAngle = -30.f; right.hitAngle = 25.f; right.rotDeg = right.restAngle; right.color = DARKBLUE;
 
     // Targets superiores con relleno
     targets.clear();
-    { Target t; t.tx = 300; t.ty = 195; t.r = 6; t.restitution = 1.10f; t.score = 100; t.ring = WHITE; t.filled = true; t.fill = RED;    targets.push_back(t); }
-    { Target t; t.tx = 225; t.ty = 260; t.r = 6; t.restitution = 1.05f; t.score = 50; t.ring = WHITE; t.filled = true; t.fill = YELLOW; targets.push_back(t); }
-    { Target t; t.tx = 375; t.ty = 260; t.r = 6; t.restitution = 1.05f; t.score = 25; t.ring = WHITE; t.filled = true; t.fill = GREEN;  targets.push_back(t); }
+    // (antes: 300,195 | 225,260 | 375,260)
+    { Target t; t.tx = 300; t.ty = 325; t.r = 6; t.restitution = 0.8f; t.score = 100; t.ring = GRAY;  t.filled = true; t.fill = RED;    targets.push_back(t); }
+    { Target t; t.tx = 185; t.ty = 390; t.r = 6; t.restitution = 0.8f; t.score = 50;  t.ring = GRAY;  t.filled = true; t.fill = YELLOW; targets.push_back(t); }
+    { Target t; t.tx = 400; t.ty = 390; t.r = 6; t.restitution = 0.8f; t.score = 25;  t.ring = GRAY;  t.filled = true; t.fill = GREEN;  targets.push_back(t); }
+    { Target t; t.tx = 300; t.ty = 65; t.r = 6; t.restitution = 0.8f; t.score = 100;  t.ring = GRAY;  t.filled = true; t.fill = RED;  targets.push_back(t); }
+    { Target t; t.tx = 300; t.ty = 520; t.r = 6; t.restitution = 0.8f; t.score = 50;  t.ring = GRAY;  t.filled = true; t.fill = YELLOW;  targets.push_back(t); }
+    { Target t; t.tx = 75; t.ty = 585; t.r = 6; t.restitution = 0.8f; t.score = 25;  t.ring = GRAY;  t.filled = true; t.fill = GREEN;  targets.push_back(t); }
+    { Target t; t.tx = 490; t.ty = 585; t.r = 6; t.restitution = 0.8f; t.score = 25;  t.ring = GRAY;  t.filled = true; t.fill = GREEN;  targets.push_back(t); }
+
 
     // Bumpers grises pequeños
     auto addBumper = [&](float x, float y, float r) {
 		// BUMPER gris
-        Target t; t.tx = x; t.ty = y; t.r = r; t.restitution = 1.25f; t.score = 0; t.ring = GRAY; t.filled = true; targets.push_back(t);
+        Target t; t.tx = x; t.ty = y; t.r = r; t.restitution = 0.9f; t.score = 0; t.ring = GRAY; t.filled = true; targets.push_back(t);
         };
     addBumper(150, 130, 4);
-    addBumper(300, 65, 4);
+    //addBumper(300, 65, 4);
     addBumper(450, 130, 4);
 
-    addBumper(300, 325, 4);
-    addBumper(185, 390, 4);
-    addBumper(400, 390, 4);
+    addBumper(300, 195, 4);
+    addBumper(225, 260, 4);
+    addBumper(375, 260, 4);
 
-    addBumper(300, 520, 4);
-	addBumper(490, 585, 4);
-	addBumper(75, 585, 4);
+    //addBumper(300, 520, 4);
+	//addBumper(490, 585, 4);
+	//addBumper(75, 585, 4);
 
 
     // Triángulos (solo contorno BRH)
     tris.clear();
-	tris.push_back({ 150,520,  225,550,  150,455, 0.75f });// coords (x1,y1, x2,y2, x3,y3, Rebote)
-    tris.push_back({ 480,500,  420,420,  400,520, 0.75f });
-   // tris.push_back({ 190,640,  260,600,  220,700, 0.75f });
-   // tris.push_back({ 610,640,  540,600,  580,700, 0.75f });
+	tris.push_back({ 150,520,  225,550,  150,455, 1.2f });// coords (x1,y1, x2,y2, x3,y3, Rebote)
+    tris.push_back({ 475,532,  400,562,  475,466,  1.2f });
 
     // OutHole
     out.area = { (float)(W / 2 - 60), (float)(H - 22), 120.f, 20.f };
 
     // Guía inclinada para salir del shooter
 	// coordenadas del segmento
-    guide.ax = shooter.area.x - 6.f;
+   /* guide.ax = shooter.area.x - 6.f;
     guide.ay = shooter.area.y + 32.f;
     guide.bx = shooter.area.x - 54.f;
     guide.by = shooter.area.y + 84.f;
     guide.thick = 14.f;
-    guide.restitution = 0.95f;
+    guide.restitution = 0.95f;*/
 
 	// Bordes del campo
 	walls.clear();
@@ -144,7 +148,7 @@ Game::Game(int w, int h) : W(w), H(h)
 	//=== Bordes de la Pantalla ===
 	walls.push_back(Wall::FromAB(20.f, 20.f, 20.f, (float)(H - 22), 14.f, BLACK, 0.98f)); // izquierda
 	walls.push_back(Wall::FromAB(20.f, 20.f, (float)(shooter.area.x - 2), 20.f, 14.f, BLACK, 0.98f)); // arriba
-	walls.push_back(Wall::FromAB((float)(shooter.area.x - 2), 200.f, (float)(shooter.area.x - 2), (float)(H - 22), 14.f, BLACK, 0.98f)); // derecha del canal
+	walls.push_back(Wall::FromAB((float)(shooter.area.x - 2), 180.f, (float)(shooter.area.x - 2), (float)(H - 22), 14.f, BLACK, 0.98f)); // derecha del canal
 
     // barrita superior
 	tr = Triangulo();
@@ -152,14 +156,31 @@ Game::Game(int w, int h) : W(w), H(h)
 
 void Game::HandleInput()
 {
+	// Controles globales
+    if (state != GameState::PLAYING) {
+		//Nueva partida
+        if (IsKeyPressed(KEY_ENTER)) {
+            score = 0;
+            lives = 3;
+            state = GameState::PLAYING;
+            ResetBallInShooter();
+        }
+        return;
+    }
+
+    // Controles de flippers
     left.pressed = IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A);
     right.pressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D);
 
+    // Reset manual de la bola -> menos una vida
     if (IsKeyPressed(KEY_R)) {
-        ball.tx = shooter.area.x + shooter.area.width * 0.5f;
-        const float spawnMarginTop = 90.f;
-        ball.ty = shooter.area.y + spawnMarginTop + ball.r;
-        ball.vx = ball.vy = 0.f;
+        lives--;
+        if (lives <= 0) {
+            state = GameState::LOST;
+        }
+        else {
+            ResetBallInShooter();
+        }
     }
 }
 
@@ -167,49 +188,58 @@ void Game::Update(float dt)
 {
     HandleInput();
 
+	if (state != GameState::PLAYING) return;
+
     // mover flippers
     left.Update(dt);
     right.Update(dt);
 
-    // shooter
-    shooter.Update(dt);
-    shooter.ApplyToBall(ball);
+	// no perder la bola
+    float maxSpeed = std::max(std::fabs(ball.vx), std::fabs(ball.vy));
+    float maxMove = maxSpeed * dt;
+    int steps = (int)std::ceilf(maxMove / (ball.r * 0.5f));
+    if (steps < 1) steps = 1;
+    if (steps > 16) steps = 16;
+    float h = dt / steps;
 
-    // física de la bola
-    ball.vy += gravity * dt;
-    ball.tx += ball.vx * dt;
-    ball.ty += ball.vy * dt;
+    for (int i = 0; i < steps; ++i)
+    {
+        shooter.Update(h);
+        shooter.ApplyToBall(ball);
 
-    // shooter
-    shooter.ApplyToBall(ball);
+        // Física
+        ball.vy += gravity * h;
+        ball.tx += ball.vx * h;
+        ball.ty += ball.vy * h;
 
-	for (auto& w : walls) {
-		w.CollideAndBounce(ball);
-	}
+        // Colisiones
+        CollideBorders();
 
-    // guía inclinada
-    guide.CollideAndBounce(ball);
+        for (auto& w : walls) w.CollideAndBounce(ball);
 
-    // colisiones con bordes del campo (si no está en el canal)
-    CollideBorders();
-
-    // colisiones con elementos
-    CollideFlippers();
-    CollideTargets();
-    CollideTriangles();
+        CollideFlippers();
+        CollideTargets();
+        CollideTriangles();
+    }
 
     // fricción
     ball.vx *= friction;
     ball.vy *= friction;
 
-    // OutHole -> respawn
+    if (score >= winScore) 
+    {
+        state = GameState::WON;
+    }
+
+	// OutHole -> respawn y pierde vida o fin de juego
     if (out.Check(ball)) {
         lives--;
-        ball.tx = shooter.area.x + shooter.area.width * 0.5f;
-        const float spawnMarginTop = 90.f;
-        ball.ty = shooter.area.y + spawnMarginTop + ball.r;
-        ball.vx = ball.vy = 0.f;
-        if (lives <= 0) { lives = 3; score = 0; }
+        if (lives <= 0) {
+            state = GameState::LOST;
+        }
+        else {
+            ResetBallInShooter();
+        }
     }
 }
 
@@ -274,15 +304,29 @@ void Game::CollideTriangles()
     }
 }
 
+void Game::ResetBallInShooter()
+{
+    ball.tx = shooter.area.x + shooter.area.width * 0.5f;
+    const float spawnMarginTop = 90.f;
+    ball.ty = shooter.area.y + spawnMarginTop + ball.r;
+    ball.vx = 0.f;
+    ball.vy = 0.f;
+
+	//Reposo del shooter
+    shooter.comp = 0.f;
+    shooter.prevComp = 0.f;
+    shooter.releasing = false;
+}
+
 void Game::Draw()
 {
     ClearBackground(Color{ 120,60,140,255 });
 
 	// Bordes del campo y canal del shooter
     Geometry g;
-    g.BRHLine(20, 20, (int)shooter.area.x - 2, 20, BLACK);
-    g.BRHLine(20, 20, 20, H - 22, BLACK);
-    g.BRHLine((int)shooter.area.x - 2, 20, (int)shooter.area.x - 2, H - 22, BLACK);
+	g.BRHLine(20, 20, (int)shooter.area.x - 2, 20, BLACK); // arriba
+	g.BRHLine(20, 20, 20, H - 22, BLACK); // izquierda
+	//g.BRHLine((int)shooter.area.x - 2, 20, (int)shooter.area.x - 2, H - 22, BLACK); // derecha del canal
 
 	for (auto& w : walls) w.Draw();
 
@@ -311,4 +355,22 @@ void Game::Draw()
     DrawText(TextFormat("Lives: %d", lives), 30, 58, 22, RAYWHITE);
     DrawText("LEFT/RIGHT or A/D = Flippers   SPACE = Spring   R = Reset Ball",
         30, 84, 18, Color{ 180,180,220,255 });
+
+    // Mensajes de estado
+    if (state != GameState::PLAYING)
+    {
+        // Oscurecer un poco el fondo
+        DrawRectangle(0, 0, W, H, Color{ 0,0,0,120 });
+
+        const char* mainText = (state == GameState::WON) ? "GANASTE!!" : "¡PERDISTE!!";
+        const char* subText = "Pulsa ENTER para nueva partida";
+        int mainSize = 48;
+        int subSize = 22;
+
+        int tw = MeasureText(mainText, mainSize);
+        DrawText(mainText, (W - tw) / 2, H / 2 - mainSize, mainSize, RAYWHITE);
+
+        int ts = MeasureText(subText, subSize);
+        DrawText(subText, (W - ts) / 2, H / 2 + 8, subSize, Color{ 220,220,220,255 });
+    }
 }

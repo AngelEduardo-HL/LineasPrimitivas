@@ -39,6 +39,8 @@ struct TriDeflector {
     }
 };
 
+enum class GameState { PLAYING, WON, LOST };
+
 class Game {
 public:
     Game(int w, int h);
@@ -67,8 +69,14 @@ private:
     int score = 0;
     int lives = 3;
 
+    GameState state = GameState::PLAYING;
+    int winScore = 250;
+
     void CollideBorders();
     void CollideFlippers();
     void CollideTargets();
     void CollideTriangles();
+
+    // NUEVO: helper para colocar la bola en el canal del shooter
+    void ResetBallInShooter();
 };

@@ -51,6 +51,49 @@ public:
     void DDACircle(float cx, float cy, float r);
     void BRHCircle(int cx, int cy, float r);
 
+	//---- AABB ----
 public:
+    struct AABB 
+    {
+        int xmin, ymin, xmax, ymax;
+    };
+
+	// Crear AABB a partir de dos puntos
+    static inline AABB MakeAABB(int x1, int y1, int x2, int y2) 
+    {
+        return { std::min(x1,x2), std::min(y1,y2), std::max(x1,x2), std::max(y1,y2) };
+    }
+	// Crear AABB a partir de un centro y radio
+    static inline bool AABBOverlap(const AABB& a, const AABB& b) 
+    {
+        return !(b.xmin > a.xmax || a.xmin > b.xmax ||
+            b.ymin > a.ymax || a.ymin > b.ymax);
+    }
+	// Crear AABB a partir de los puntos guardados
+    static inline AABB Inflate(const AABB& a, int pad) 
+    {
+        return { a.xmin - pad, a.ymin - pad, a.xmax + pad, a.ymax + pad };
+    }
+
     virtual ~Geometry() = default;
+
+
+protected:
+    AABB ComputeAABBFromSavedPts() const 
+    {
+        AABB b{ 0,0,0,0 };
+        if (pts.empty()) return b;
+
+        b.xmin = b.xmax = pts[0].x;
+        b.ymin = b.ymax = pts[0].y;
+
+        for (size_t i = 1; i < pts.size(); ++i) {
+            const auto& p = pts[i];
+            if (p.x < b.xmin) b.xmin = p.x;
+            if (p.x > b.xmax) b.xmax = p.x;
+            if (p.y < b.ymin) b.ymin = p.y;
+            if (p.y > b.ymax) b.ymax = p.y;
+        }
+        return b;
+    }
 };

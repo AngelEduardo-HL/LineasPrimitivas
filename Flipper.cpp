@@ -55,8 +55,8 @@ bool Flipper::CheckCollision(const Ball& b, CollisionInfo& info)
     float qx, qy;
     float d = DistPointSeg(b.tx, b.ty, ax, ay, bx, by, qx, qy);
 
-	const float slop = 1.0f; // margen extra para evitar que se atasque
-    float rad = b.r + width * 1.5f + slop; 
+	const float slop = 0.5f; // margen extra para evitar que se atasque
+    float rad = b.r + width * 1.0f + slop;
 
     if (d < rad)
     {
@@ -77,7 +77,7 @@ void Flipper::OnCollision(Ball& b, const CollisionInfo& info)
     b.tx += info.nx * info.penetration;
     b.ty += info.ny * info.penetration;
 
-	const float restitution = 0.95f; // Rebote grande por ser Flippers
+	const float restitution = 1.1f; // Rebote grande por ser Flippers
     float vn = b.vx * info.nx + b.vy * info.ny;
     b.vx = b.vx - (1.0f + restitution) * vn * info.nx;
     b.vy = b.vy - (1.0f + restitution) * vn * info.ny;
